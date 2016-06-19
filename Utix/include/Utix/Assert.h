@@ -47,20 +47,20 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 #endif
 
 #define _UTIX_MACRO_STR_EX_(x) #x
-#define _UTIX_MACRO_STR_(x) _XCHIP_MACRO_STR_EX_(x)
+#define _UTIX_MACRO_STR_(x) _UTIX_MACRO_STR_EX_(x)
 
 #define ASSERT_MSG(cond, msg)                                            \
 {                                                                        \
-    using xchip::utils::LogError;                                        \
+                                                                         \
     if(!(cond))                                                          \
     {                                                                    \
-        LogError("\n                          \n"                        \
+        utix::LogError("\n                          \n"                  \
                  "****************************\n"                        \
                  "*                          *\n"                        \
                  "*    !ASSERTION FAILED!    *\n"                        \
                  "*                          *\n"                        \
                  "****************************");                        \
-        LogError("CONDITION: "#cond"\n"                                  \
+        utix::LogError("CONDITION: "#cond"\n"                            \
                  "MESSAGE:   " msg "\n"                                  \
                  "FILE: " __FILE__ ":" _UTIX_MACRO_STR_(__LINE__)"\n");  \
         _UTIX_DEBUG_BREAK_();                                            \
