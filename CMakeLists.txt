@@ -4,27 +4,34 @@ cmake_minimum_required(VERSION 2.8.8)
 option(ADDRESS_SANITIZER OFF)
 option(MEMORY_SANITIZER OFF)
 
-
-
+#include Xlib
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Xlib/include/)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -std=c++11 -Wall -Wextra")
 
-
-
-
-
+# compiler settings flags
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -std=c++11 -pedantic")
 
 if(NOT CMAKE_BUILD_TYPE)
+	message(STATUS "No build type selected! default to release")
 	set(CMAKE_BUILD_TYPE "Release")
 endif()
 
-if(CMAKE_BUILD_TYPE STREQUAL "Release")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
-elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g")
-elseif(CMAKE_BUILD_TYPE STREQUAL "Bench")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g")
+
+
+# "Release" full optimization , no debug info.
+if(${CMAKE_BUILD_TYPE} STREQUAL "Release")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG -O3 -fomit-frame-pointer -ffunction-sections -fdata-sections -g0")
+
+
+
+# "Debug" full debug information, no optimization, asserts enabled
+elseif(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g3 -D_DEBUG")
+
+
+# "Bench" better code generation but keep debug information
+elseif(${CMAKE_BUILD_TYPE} STREQUAL "Bench")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g  -DNDEBUG")
 endif()
 
 
@@ -38,5 +45,5 @@ endif()
 
 
 
-
+# build Xlib
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Xlib/src)
