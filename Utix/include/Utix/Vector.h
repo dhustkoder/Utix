@@ -485,7 +485,7 @@ inline void Vector<TYPE>::free() noexcept
 
 
 
-}}
+}
 
 
 #endif
