@@ -6,7 +6,7 @@ option(MEMORY_SANITIZER OFF)
 
 
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Xlib/include/)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -std=c++11 -Wall -Wextra")
 
@@ -37,4 +37,6 @@ if( UNDEFINED_SANITIZER )
 endif()
 
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src)
+
+
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Xlib/src)
