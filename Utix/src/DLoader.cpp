@@ -1,6 +1,6 @@
 /*
 
-XLIB - utility library from XChip
+Utix - utility library from XChip
 Copyright (C) 2016  Rafael Moura
 
 This program is free software: you can redistribute it and/or modify
@@ -18,11 +18,11 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 */
 
-#include <Xlib/DLoader.h>
-#include <Xlib/Assert.h>
-#include <Xlib/Log.h>
+#include <Utix/DLoader.h>
+#include <Utix/Assert.h>
+#include <Utix/Log.h>
 
-namespace xlib {
+namespace utix {
 
 
 DLoader::DLoader(DLoader&& rhs) noexcept

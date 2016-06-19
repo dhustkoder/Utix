@@ -1,6 +1,6 @@
 /*
 
-XLIB - utility library from XChip
+Utix - utility library from XChip
 Copyright (C) 2016  Rafael Moura
 
 This program is free software: you can redistribute it and/or modify
@@ -18,11 +18,11 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 */
 
-#ifndef _XLIB_BASETRAITS_H_
-#define _XLIB_BASETRAITS_H_
+#ifndef _UTIX_BASETRAITS_H_
+#define _UTIX_BASETRAITS_H_
 #include "Ints.h"
 
-namespace xlib {
+namespace utix {
 
 
 // basic metaprogramming return types: true, false

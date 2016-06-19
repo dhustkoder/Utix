@@ -1,6 +1,6 @@
 /*
 
-XLIB - utility library from XChip
+UTIX - utility library from XChip
 Copyright (C) 2016  Rafael Moura
 
 This program is free software: you can redistribute it and/or modify
@@ -18,47 +18,24 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 */
 
-#ifndef _XLIB_SCOPE_EXIT_H_
-#define _XLIB_SCOPE_EXIT_H_
+#ifndef _UTIX_TRAITS_H_
+#define _UTIX_TRAITS_H_
+#include <type_traits>
 #include "BaseTraits.h"
 
-namespace xlib {
-
-
-
-
-template<class F>
-struct ScopeExit
-{
-	constexpr ScopeExit(F&& fun) noexcept : _fun(forward<F>(fun)) {
-		static_assert(noexcept(fun()) == true, "ScopeExit functor must be noexcept!");
-	}
-	~ScopeExit() noexcept { _fun(); }
-	ScopeExit(ScopeExit&& rhs) noexcept = default;
-	ScopeExit(const ScopeExit&) = delete;
-	ScopeExit& operator=(const ScopeExit&) = delete;
-private:
-	F _fun;
-};
-
+namespace utix {
 
 template<class T>
-constexpr inline ScopeExit<T> make_scope_exit(T&& t) noexcept {
-	return ScopeExit<T>(forward<T>(t));
+using underlying_type_t = typename std::underlying_type<T>::type;
+
+template<class T> 
+constexpr underlying_type_t<T> toUtype(T t) noexcept
+{
+	return static_cast<underlying_type_t<T>>(t);
 }
 
 
-
-
-
-
 }
-
-
-
-
-
-
 
 
 

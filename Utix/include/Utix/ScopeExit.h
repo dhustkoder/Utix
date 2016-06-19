@@ -1,6 +1,6 @@
 /*
 
-XLIB - utility library from XChip
+UTIX - utility library from XChip
 Copyright (C) 2016  Rafael Moura
 
 This program is free software: you can redistribute it and/or modify
@@ -18,46 +18,48 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 */
 
-#ifndef _XLIB_LOG_H_
-#define _XLIB_LOG_H_
+#ifndef _UTIX_SCOPE_EXIT_H_
+#define _UTIX_SCOPE_EXIT_H_
+#include "BaseTraits.h"
 
-
-#include <string>
-#include "Ints.h"
-
-namespace xlib {
+namespace utix {
 
 
 
-namespace literals 
+
+template<class F>
+struct ScopeExit
 {
-	inline std::string operator"" _s(const char* str, size_t) { return std::string(str); }
-}
+	constexpr ScopeExit(F&& fun) noexcept : _fun(forward<F>(fun)) {
+		static_assert(noexcept(fun()) == true, "ScopeExit functor must be noexcept!");
+	}
+	~ScopeExit() noexcept { _fun(); }
+	ScopeExit(ScopeExit&& rhs) noexcept = default;
+	ScopeExit(const ScopeExit&) = delete;
+	ScopeExit& operator=(const ScopeExit&) = delete;
+private:
+	F _fun;
+};
 
 
-extern void Log(const char* fmtString, ...) noexcept;
-extern void LogError(const char* fmtString, ...) noexcept;
-extern const std::string& GetLastLogError() noexcept;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+template<class T>
+constexpr inline ScopeExit<T> make_scope_exit(T&& t) noexcept {
+	return ScopeExit<T>(forward<T>(t));
 }
 
 
 
-#endif // LOG_H
+
+
+
+}
+
+
+
+
+
+
+
+
+
+#endif

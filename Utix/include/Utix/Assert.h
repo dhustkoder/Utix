@@ -1,6 +1,6 @@
 /*
 
-XLIB - utility library from XChip
+UTIX - utility library from XChip
 Copyright (C) 2016  Rafael Moura
 
 This program is free software: you can redistribute it and/or modify
@@ -18,8 +18,8 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 */
 
-#ifndef _XLIB_ASSERT_H_
-#define _XLIB_ASSERT_H_
+#ifndef _UTIX_ASSERT_H_
+#define _UTIX_ASSERT_H_
 
 
 #if !_DEBUG
@@ -41,13 +41,13 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 #include "Log.h"
 
 #ifdef _WIN32
-#define _XCHIP_DEBUG_BREAK_() __debugbreak()
+#define _UTIX_DEBUG_BREAK_() __debugbreak()
 #elif defined(__linux__) || defined(__APPLE__)
-#define _XCHIP_DEBUG_BREAK_() raise(SIGTRAP)
+#define _UTIX_DEBUG_BREAK_() raise(SIGTRAP)
 #endif
 
-#define _XCHIP_MACRO_STR_EX_(x) #x
-#define _XCHIP_MACRO_STR_(x) _XCHIP_MACRO_STR_EX_(x)
+#define _UTIX_MACRO_STR_EX_(x) #x
+#define _UTIX_MACRO_STR_(x) _XCHIP_MACRO_STR_EX_(x)
 
 #define ASSERT_MSG(cond, msg)                                            \
 {                                                                        \
@@ -62,8 +62,8 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
                  "****************************");                        \
         LogError("CONDITION: "#cond"\n"                                  \
                  "MESSAGE:   " msg "\n"                                  \
-                 "FILE: " __FILE__ ":" _XCHIP_MACRO_STR_(__LINE__)"\n"); \
-        _XCHIP_DEBUG_BREAK_();                                           \
+                 "FILE: " __FILE__ ":" _UTIX_MACRO_STR_(__LINE__)"\n");  \
+        _UTIX_DEBUG_BREAK_();                                            \
     }                                                                    \
 }
 

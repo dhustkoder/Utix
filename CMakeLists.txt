@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.8)
-
+project(Utix)
 
 option(ADDRESS_SANITIZER OFF)
 option(MEMORY_SANITIZER OFF)
@@ -40,4 +40,4 @@ if( UNDEFINED_SANITIZER )
 endif()
 
 
-add_subdirectory(Xlib)
+add_subdirectory(Utix)

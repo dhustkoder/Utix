@@ -1,6 +1,6 @@
 /*
 
-XLIB - utility library from XChip
+UTIX - utility library from XChip
 Copyright (C) 2016  Rafael Moura
 
 This program is free software: you can redistribute it and/or modify
@@ -18,8 +18,8 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 */
 
-#ifndef _XLIB_PROCESS_H_
-#define _XLIB_PROCESS_H_
+#ifndef _UTIX_PROCESS_H_
+#define _UTIX_PROCESS_H_
 
 #if defined(__APPLE__) || defined(__linux__)
 #include <signal.h>
@@ -45,7 +45,7 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 
 
-namespace xlib {
+namespace utix {
 	
 	
 class Process

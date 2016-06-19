@@ -1,6 +1,6 @@
 /*
 
-XLIB - utility library from XChip
+utix - utility library from XChip
 Copyright (C) 2016  Rafael Moura
 
 This program is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 #include <cstdio>
 #include <cstdarg>
 #include <cstring>
-#include <Xlib/Log.h>
+#include <Utix/Log.h>
 
 
 
@@ -30,7 +30,7 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 
 
-namespace xlib {
+namespace utix {
 
 
 static std::string errstr(512, '\0');

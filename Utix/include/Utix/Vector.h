@@ -1,6 +1,6 @@
 /*
 
-XLIB - utility library from XChip
+UTIX - utility library from XChip
 Copyright (C) 2016  Rafael Moura
 
 This program is free software: you can redistribute it and/or modify
@@ -21,8 +21,8 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 
 
-#ifndef _XLIB_VECTOR_H_
-#define _XLIB_VECTOR_H_
+#ifndef _UTIX_VECTOR_H_
+#define _UTIX_VECTOR_H_
 
 #include <cstdlib>
 #include <cstring>
@@ -34,7 +34,7 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 
 
-namespace xlib {
+namespace utix {
 
 
 template<class TYPE>

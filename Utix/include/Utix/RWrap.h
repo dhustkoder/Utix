@@ -1,6 +1,6 @@
 /*
 
-XLIB - utility library from XChip
+UTIX - utility library from XChip
 Copyright (C) 2016  Rafael Moura
 
 This program is free software: you can redistribute it and/or modify
@@ -18,8 +18,8 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 */
 
-#ifndef _XLIB_RWRAP_H_
-#define _XLIB_RWRAP_H_
+#ifndef _UTIX_RWRAP_H_
+#define _UTIX_RWRAP_H_
 
 #include "BaseTraits.h"
 
@@ -28,7 +28,7 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 
 
-namespace xlib {
+namespace utix {
 
 
 

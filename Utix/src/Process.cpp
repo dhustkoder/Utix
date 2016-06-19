@@ -1,6 +1,6 @@
 /*
 
-XLIB - utility library from XChip
+Utix - utility library from XChip
 Copyright (C) 2016  Rafael Moura
 
 This program is free software: you can redistribute it and/or modify
@@ -23,12 +23,12 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 #include <string>
 #include <algorithm>
 
-#include <Xlib/Log.h>
-#include <Xlib/Process.h>
-#include <Xlib/ScopeExit.h>
-#include <Xlib/Timer.h>
+#include <Utix/Log.h>
+#include <Utix/Process.h>
+#include <Utix/ScopeExit.h>
+#include <Utix/Timer.h>
 
-namespace xlib { 
+namespace utix { 
 	
 #if defined(__APPLE__) || defined(__linux__)
 	

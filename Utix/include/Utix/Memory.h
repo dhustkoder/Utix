@@ -1,6 +1,6 @@
 /*
 
-XLIB - utility library from XChip
+UTIX - utility library from XChip
 Copyright (C) 2016  Rafael Moura
 
 This program is free software: you can redistribute it and/or modify
@@ -18,13 +18,13 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 */
 
-#ifndef _XLIB_MEMORY_H_
-#define _XLIB_MEMORY_H_
+#ifndef _UTIX_MEMORY_H_
+#define _UTIX_MEMORY_H_
 
 #include <memory>
 #include "Traits.h"
  
-namespace xlib {
+namespace utix {
 
 
 

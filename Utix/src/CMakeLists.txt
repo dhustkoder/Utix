@@ -1,4 +1,4 @@
-project(Xlib)
+project(Utix)
 
 # exceptions and rtti are NOT used on Utility.
 # static version
@@ -12,13 +12,13 @@ target_link_libraries(${PROJECT_NAME} -ldl)
 
 
 
-INSTALL(TARGETS Xlib  DESTINATION ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/lib/)
+INSTALL(TARGETS ${PROJECT_NAME}  DESTINATION ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/lib/)
 
 
 # fpic version
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 
-add_library(XlibFPIC ${HEADERS} ${SRC})
-target_link_libraries(XlibFPIC -ldl)
+add_library(UtixFPIC ${HEADERS} ${SRC})
+target_link_libraries(UtixFPIC -ldl)
 
-INSTALL(TARGETS XlibFPIC DESTINATION ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/lib/)
+INSTALL(TARGETS UtixFPIC DESTINATION ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/lib/)

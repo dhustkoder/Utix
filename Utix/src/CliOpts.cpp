@@ -1,6 +1,6 @@
 /*
 
-XLIB - utility library from XChip
+UTIX - utility library from XChip
 Copyright (C) 2016  Rafael Moura
 
 This program is free software: you can redistribute it and/or modify
@@ -23,12 +23,12 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 
 
-#include <Xlib/Ints.h>
-#include <Xlib/Log.h>
-#include <Xlib/CliOpts.h>
+#include <Utix/Ints.h>
+#include <Utix/Log.h>
+#include <Utix/CliOpts.h>
 
 
-namespace xlib {
+namespace utix {
 
 
 

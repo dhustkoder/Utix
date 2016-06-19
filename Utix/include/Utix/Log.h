@@ -1,6 +1,6 @@
 /*
 
-XLIB - utility library from XChip
+UTIX - utility library from XChip
 Copyright (C) 2016  Rafael Moura
 
 This program is free software: you can redistribute it and/or modify
@@ -18,25 +18,46 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 */
 
-#ifndef _XLIB_TRAITS_H_
-#define _XLIB_TRAITS_H_
-#include <type_traits>
-#include "BaseTraits.h"
+#ifndef _UTIX_LOG_H_
+#define _UTIX_LOG_H_
 
-namespace xlib {
 
-template<class T>
-using underlying_type_t = typename std::underlying_type<T>::type;
+#include <string>
+#include "Ints.h"
 
-template<class T> 
-constexpr underlying_type_t<T> toUtype(T t) noexcept
+namespace utix {
+
+
+
+namespace literals 
 {
-	return static_cast<underlying_type_t<T>>(t);
+	inline std::string operator"" _s(const char* str, size_t) { return std::string(str); }
 }
 
 
+extern void Log(const char* fmtString, ...) noexcept;
+extern void LogError(const char* fmtString, ...) noexcept;
+extern const std::string& GetLastLogError() noexcept;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 
 
-#endif
+#endif // LOG_H

@@ -1,6 +1,6 @@
 /*
 
-XLIB - utility library from XChip
+UTIX - utility library from XChip
 Copyright (C) 2016  Rafael Moura
 
 This program is free software: you can redistribute it and/or modify
@@ -21,14 +21,14 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 
 
-#ifndef _XLIB_COMMON_H_
-#define _XLIB_COMMON_H_
+#ifndef _UTIX_COMMON_H_
+#define _UTIX_COMMON_H_
 #include <string>
 #include "BaseTraits.h"
 #include "Timer.h"
 
 
-namespace xlib {
+namespace utix {
 
 template<class T>
 inline enable_if_t<is_numeric<T>::value> Clamp(T& lval, const T min, const T max)
