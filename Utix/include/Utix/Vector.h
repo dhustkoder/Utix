@@ -27,7 +27,7 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 #include <cstdlib>
 #include <cstring>
 #include <initializer_list>
-#include "BaseTraits.h"
+#include "Traits.h"
 #include "Alloc.h"
 #include "Assert.h"
 #include "Log.h"
