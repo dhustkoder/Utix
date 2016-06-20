@@ -21,8 +21,8 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 
 
-#ifndef _UTIX_VECTOR_H_
-#define _UTIX_VECTOR_H_
+#ifndef _UTIX_PODVECTOR_H_
+#define _UTIX_PODVECTOR_H_
 
 #include <cstdlib>
 #include <cstring>
@@ -38,17 +38,17 @@ namespace utix {
 
 
 template<class TYPE>
-class Vector
+class PodVector
 {
-	static_assert(std::is_pod<TYPE>::value, "Vector only support pod types");
+	static_assert(std::is_pod<TYPE>::value, "PodVector only support pod types");
 public:
-	Vector(const Vector&) = delete;
-	Vector& operator=(const Vector&) = delete;
+	PodVector(const PodVector&) = delete;
+	PodVector& operator=(const PodVector&) = delete;
 
-	Vector() = default;
-	Vector(Vector&& other) noexcept;
-	~Vector();
-	Vector& operator=(Vector&& other) noexcept;
+	PodVector() = default;
+	PodVector(PodVector&& other) noexcept;
+	~PodVector();
+	PodVector& operator=(PodVector&& other) noexcept;
 
 	bool empty() const;
 	size_t size() const;
@@ -62,10 +62,10 @@ public:
 	const TYPE& operator[](size_t offset) const;
 
 
-	bool initialize(const size_t vectorSize = 1);
+	bool initialize(const size_t PodVectorSize = 1);
 	bool initialize(const TYPE* data, const size_t size);
-	bool initialize(const Vector& other);
-	void initialize(Vector&& other) noexcept;
+	bool initialize(const PodVector& other);
+	void initialize(PodVector&& other) noexcept;
 	bool initialize(const TYPE* begin, const TYPE* end); 
 	bool initialize(std::initializer_list<TYPE> list);
 	template<size_t sz>
@@ -84,8 +84,8 @@ public:
 	TYPE* data();
 	TYPE& operator[](size_t offset);
 
-	bool copy(const Vector& other);
-	void swap(Vector& other) noexcept;
+	bool copy(const PodVector& other);
+	void swap(PodVector& other) noexcept;
 	void free() noexcept;
 
 
@@ -100,7 +100,7 @@ private:
 
 
 template<class TYPE>
-Vector<TYPE>::Vector(Vector&& other) noexcept
+PodVector<TYPE>::PodVector(PodVector&& other) noexcept
 	: _data(other._data),
 	_size(other._size)
 {
@@ -110,14 +110,14 @@ Vector<TYPE>::Vector(Vector&& other) noexcept
 
 
 template<class TYPE>
-Vector<TYPE>::~Vector()
+PodVector<TYPE>::~PodVector()
 {
 	this->free();
 }
 
 
 template<class TYPE>
-Vector<TYPE>& Vector<TYPE>::operator=(Vector&& other) noexcept
+PodVector<TYPE>& PodVector<TYPE>::operator=(PodVector&& other) noexcept
 {
 	this->swap(other);
 }
@@ -126,21 +126,21 @@ Vector<TYPE>& Vector<TYPE>::operator=(Vector&& other) noexcept
 
 
 template<class TYPE>
-inline bool Vector<TYPE>::empty() const
+inline bool PodVector<TYPE>::empty() const
 {
 	return _size == 0;
 }
 
 
 template<class TYPE>
-inline size_t Vector<TYPE>::size() const
+inline size_t PodVector<TYPE>::size() const
 {
 	return _size;
 }
 
 
 template<class TYPE>
-inline size_t Vector<TYPE>::capacity() const
+inline size_t PodVector<TYPE>::capacity() const
 {
 	return arr_size(_data);
 }
@@ -148,14 +148,14 @@ inline size_t Vector<TYPE>::capacity() const
 
 
 template<class TYPE>
-inline const TYPE* Vector<TYPE>::cbegin() const
+inline const TYPE* PodVector<TYPE>::cbegin() const
 {
 	return _data;
 }
 
 
 template<class TYPE>
-inline const TYPE* Vector<TYPE>::cend() const
+inline const TYPE* PodVector<TYPE>::cend() const
 {
 	return _data + this->size();
 }
@@ -164,29 +164,29 @@ inline const TYPE* Vector<TYPE>::cend() const
 
 
 template<class TYPE>
-inline const TYPE* Vector<TYPE>::begin() const
+inline const TYPE* PodVector<TYPE>::begin() const
 {
 	return _data;
 }
 
 template<class TYPE>
-inline const TYPE* Vector<TYPE>::end() const
+inline const TYPE* PodVector<TYPE>::end() const
 {
 	return _data + this->size();
 }
 
 template<class TYPE>
-inline const TYPE* Vector<TYPE>::data() const
+inline const TYPE* PodVector<TYPE>::data() const
 {
 	return _data;
 }
 
 
 template<class TYPE>
-inline const TYPE& Vector<TYPE>::operator[](size_t offset) const
+inline const TYPE& PodVector<TYPE>::operator[](size_t offset) const
 {
 	ASSERT_MSG( _data != nullptr && offset < arr_size(_data), 
-		"offset overflow or not initialized vector");
+		"offset overflow or not initialized PodVector");
 
 	return _data[offset];
 }
@@ -198,9 +198,9 @@ inline const TYPE& Vector<TYPE>::operator[](size_t offset) const
 
 
 template<class TYPE>
-inline bool Vector<TYPE>::initialize(const size_t vectorSize)
+inline bool PodVector<TYPE>::initialize(const size_t PodVectorSize)
 {
-	if (this->resize(vectorSize > 1 ? vectorSize : 1))
+	if (this->resize(PodVectorSize > 1 ? PodVectorSize : 1))
 		return true;
 
 	return false;
@@ -211,7 +211,7 @@ inline bool Vector<TYPE>::initialize(const size_t vectorSize)
 
 
 template<class TYPE>
-bool Vector<TYPE>::initialize(const TYPE* data, const size_t size)
+bool PodVector<TYPE>::initialize(const TYPE* data, const size_t size)
 {
 	if(this->resize(size ? size : 1))
 	{
@@ -228,7 +228,7 @@ bool Vector<TYPE>::initialize(const TYPE* data, const size_t size)
 
 
 template<class TYPE>
-inline bool Vector<TYPE>::initialize(const Vector& other)
+inline bool PodVector<TYPE>::initialize(const PodVector& other)
 {
 	return this->initialize(other._data, other.capacity());
 }
@@ -236,14 +236,14 @@ inline bool Vector<TYPE>::initialize(const Vector& other)
 
 
 template<class TYPE>
-inline void Vector<TYPE>::initialize(Vector&& other) noexcept
+inline void PodVector<TYPE>::initialize(PodVector&& other) noexcept
 {
 	this->swap(other);
 }
 
 
 template<class TYPE>
-inline bool Vector<TYPE>::initialize(const TYPE* begin, const TYPE* end)
+inline bool PodVector<TYPE>::initialize(const TYPE* begin, const TYPE* end)
 {
 	return this->initialize(begin, static_cast<size_t>(end - begin));
 }
@@ -251,7 +251,7 @@ inline bool Vector<TYPE>::initialize(const TYPE* begin, const TYPE* end)
 
 
 template<class TYPE>
-inline bool Vector<TYPE>::initialize(std::initializer_list<TYPE> list)
+inline bool PodVector<TYPE>::initialize(std::initializer_list<TYPE> list)
 {
 	return this->initialize(list.begin(), list.size());
 }
@@ -260,7 +260,7 @@ inline bool Vector<TYPE>::initialize(std::initializer_list<TYPE> list)
 
 template<class TYPE>
 template<size_t sz>
-inline bool Vector<TYPE>::initialize(TYPE(&data)[sz])
+inline bool PodVector<TYPE>::initialize(TYPE(&data)[sz])
 {
 	return this->initialize(data, sz);
 }
@@ -270,7 +270,7 @@ inline bool Vector<TYPE>::initialize(TYPE(&data)[sz])
 
 
 template<class TYPE>
-inline TYPE* Vector<TYPE>::begin()
+inline TYPE* PodVector<TYPE>::begin()
 {
 	return _data;
 }
@@ -279,7 +279,7 @@ inline TYPE* Vector<TYPE>::begin()
 
 
 template<class TYPE>
-inline TYPE* Vector<TYPE>::end()
+inline TYPE* PodVector<TYPE>::end()
 {
 	return _data + this->size();
 }
@@ -287,7 +287,7 @@ inline TYPE* Vector<TYPE>::end()
 
 
 template<class TYPE>
-inline TYPE* Vector<TYPE>::data()
+inline TYPE* PodVector<TYPE>::data()
 {
 	return _data;
 }
@@ -295,10 +295,10 @@ inline TYPE* Vector<TYPE>::data()
 
 
 template<class TYPE>
-inline TYPE& Vector<TYPE>::operator[](size_t offset)
+inline TYPE& PodVector<TYPE>::operator[](size_t offset)
 {
 	ASSERT_MSG( _data != nullptr && offset < arr_size(_data), 
-		"offset overflow or not initialized vector");
+		"offset overflow or not initialized PodVector");
 
 	return _data[offset];
 }
@@ -308,7 +308,7 @@ inline TYPE& Vector<TYPE>::operator[](size_t offset)
 
 
 template<class TYPE>
-bool Vector<TYPE>::push_back(const TYPE& type)
+bool PodVector<TYPE>::push_back(const TYPE& type)
 {
 	if( this->capacity() > _size )
 	{	
@@ -331,7 +331,7 @@ bool Vector<TYPE>::push_back(const TYPE& type)
 
 template<class TYPE>
 template<class ...Args>
-bool Vector<TYPE>::emplace_back(Args&& ...args)
+bool PodVector<TYPE>::emplace_back(Args&& ...args)
 {
 	if( this->capacity() > _size )
 	{
@@ -354,7 +354,7 @@ bool Vector<TYPE>::emplace_back(Args&& ...args)
 
 
 template<class TYPE>
-void Vector<TYPE>::clear()
+void PodVector<TYPE>::clear()
 {
 	_size = 0;
 }
@@ -365,7 +365,7 @@ void Vector<TYPE>::clear()
 
 
 template<class TYPE>
-bool Vector<TYPE>::reserve(const size_t size)
+bool PodVector<TYPE>::reserve(const size_t size)
 {
 	const auto _capacity = this->capacity();
 	
@@ -383,7 +383,7 @@ bool Vector<TYPE>::reserve(const size_t size)
 		return true;
 	}
 
-	LogError("Failed to reserve memory for Vector");
+	LogError("Failed to reserve memory for PodVector");
 	return false;	
 }
 
@@ -393,7 +393,7 @@ bool Vector<TYPE>::reserve(const size_t size)
 
 
 template<class TYPE>
-bool Vector<TYPE>::resize(const size_t size)
+bool PodVector<TYPE>::resize(const size_t size)
 {
 	if(this->reserve(size))
 	{
@@ -411,11 +411,11 @@ bool Vector<TYPE>::resize(const size_t size)
 
 
 template<class TYPE>
-bool Vector<TYPE>::copy(const Vector& other)
+bool PodVector<TYPE>::copy(const PodVector& other)
 {
 	if(this != &other)
 	{
-		Vector<TYPE> tmp;
+		PodVector<TYPE> tmp;
 		
 		if( tmp.initialize(other._data, other.capacity()) )
 		{
@@ -437,7 +437,7 @@ bool Vector<TYPE>::copy(const Vector& other)
 
 
 template<class TYPE>
-void Vector<TYPE>::swap(Vector& other) noexcept
+void PodVector<TYPE>::swap(PodVector& other) noexcept
 {
 	if( this != &other )
 	{
@@ -457,7 +457,7 @@ void Vector<TYPE>::swap(Vector& other) noexcept
 
 
 template<class TYPE>
-inline void Vector<TYPE>::free() noexcept
+inline void PodVector<TYPE>::free() noexcept
 {
 	if(_data)
 	{
