@@ -68,7 +68,9 @@ public:
 	bool initialize(const TYPE* begin, const TYPE* end); 
 	bool initialize(std::initializer_list<TYPE> list);
 	template<size_t sz>
-	bool initialize(TYPE(&data)[sz]);
+	bool initialize(const TYPE(&data)[sz]);
+	template<size_t sz>
+	bool initialize(TYPE(&&data)[sz]);
 	bool push_back(const TYPE& type);
 	bool push_back(TYPE&& type);
 	template<class ...Args>
@@ -345,9 +347,24 @@ inline bool Vector<TYPE>::initialize(std::initializer_list<TYPE> list)
 
 template<class TYPE>
 template<size_t sz>
-inline bool Vector<TYPE>::initialize(TYPE(&data)[sz])
+inline bool Vector<TYPE>::initialize(const TYPE(&data)[sz])
 {
 	return this->initialize(data, sz);
+}
+
+
+template<class TYPE>
+template<size_t sz>
+inline bool Vector<TYPE>::initialize(TYPE(&&data)[sz])
+{
+	if( this->_reserve(sz) )
+	{
+		this->_fill_move(_data, data, sz);
+		this->_size = sz;
+		return true;
+	}
+
+	return false;
 }
 
 
@@ -520,13 +537,24 @@ template<class U>
 enable_if_t<std::is_pod<U>::value == true, 
 bool> Vector<TYPE>::_reserve(size_t requested_size)
 {
-	// TODO: check for extreme values
+	// TODO: better check for extreme values
 
 	const auto _capacity = this->capacity();
-	if( _capacity >= requested_size )
+
+	// if requested size is 0, grow current _capacity by 2
+	if( requested_size == 0 )
+		requested_size = _capacity * 2;
+
+	else if( _capacity >= requested_size )
 		return true;
 
 	size_t bytes_to_allocate = sizeof(TYPE) * requested_size;
+
+	if( (bytes_to_allocate / sizeof(TYPE)) < requested_size) {
+		LogError("Can't allocate %zu elements of TYPE with size %zu", requested_size, sizeof(TYPE));
+		return false;
+	}
+
 
 	TYPE* const buff = (_capacity != 0) ? (TYPE*) realloc_arr(_data, bytes_to_allocate) 
                                             : (TYPE*) alloc_arr(bytes_to_allocate);
@@ -638,13 +666,24 @@ template<class U>
 enable_if_t<std::is_pod<U>::value == false, 
 bool> Vector<TYPE>::_reserve(size_t requested_size)
 {
-	// TODO: checks for extreme values and treat it properly
+	// TODO: better check for extreme values
 
 	const auto _capacity = this->capacity();
-	if( _capacity >= requested_size )
+
+	// if requested size is 0, grow current _capacity by 2
+	if( requested_size == 0 )
+		requested_size = _capacity * 2;
+	else if( _capacity >= requested_size )
 		return true;
 
 	size_t bytes_to_allocate = sizeof(TYPE) * requested_size;
+
+	if( (bytes_to_allocate / sizeof(TYPE)) < requested_size) 
+	{
+		LogError("Can't allocate %zu elements of TYPE with size %zu", requested_size, sizeof(TYPE));
+		return false;
+	}
+
 
 	TYPE* const buff = (TYPE*) alloc_arr( bytes_to_allocate );
 
