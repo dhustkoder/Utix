@@ -1,6 +1,5 @@
 #include <iostream>
 #include <stdexcept>
-#include <vector>
 #include <Utix/Log.h>
 #include <Utix/Vector.h>
 
@@ -16,8 +15,8 @@ struct NonPod
 	{ 
 		Log("Copy ctor for NonPods %d", id);
 
-		if(id==20) 
-			throw std::runtime_error("ERR"); 
+//		if(id==20) 
+//			throw std::runtime_error("ERR"); 
 	}
 
 	NonPod(NonPod&& o) : id(o.id) { o.id=-o.id; /*Log("Move ctor of NonPods %d", id);*/ }
@@ -33,15 +32,21 @@ volatile int NonPod::s_i = 1;
 
 int main()
 {
-
+	const auto x = 1000000;
 	Log("Hello Utix test");
-
-//	std::vector<NonPod> v;
+	Log("%zu | %zu", x, x *2);
 	Vector<NonPod> v;
+	v.reserve(x * 2);
+	v.resize(x);
+	v.emplace_back(0);
 
-	v.reserve(1000000);
-	for(int i = 0; i < 1000000; ++i)
-		v.emplace_back(i);
+
+
+
+
+
+
+
 
 
 	return 0;

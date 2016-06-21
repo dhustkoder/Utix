@@ -93,7 +93,6 @@ public:
 private:
 
 	// pod functions
-
 	template<class U = TYPE, class ...Args>
 	enable_if_t<std::is_pod<U>::value == true> 
 	_insert_back(Args&& ...args);
@@ -101,6 +100,11 @@ private:
 	template<class U = TYPE>
 	enable_if_t<std::is_pod<U>::value == true, 
 	bool> _reserve(size_t requested_size = 0);
+
+	template<class U = TYPE>
+	enable_if_t<std::is_pod<U>::value == true, 
+	bool> _resize(const size_t requested_size);
+
 
 	template<class U = TYPE>
 	enable_if_t<std::is_pod<U>::value == true> 
@@ -131,6 +135,9 @@ private:
 	enable_if_t<std::is_pod<U>::value == false, 
 	bool> _reserve(size_t requested_size = 0);
 
+	template<class U = TYPE>
+	enable_if_t<std::is_pod<U>::value == false, 
+	bool> _resize(const size_t requested_size);
 
 	template<class U = TYPE>
 	enable_if_t<std::is_pod<U>::value == false> 
@@ -442,16 +449,7 @@ bool Vector<TYPE>::reserve(const size_t size)
 template<class TYPE>
 bool Vector<TYPE>::resize(const size_t requested_size)
 {
-	if(_size < requested_size-1)
-	{
-		if( requested_size >= this->capacity())
-			if(!this->_reserve(requested_size))
-				return false;
-
-		_size = requested_size-1;
-	}
-
-	return false;
+	return _resize(requested_size);
 }
 
 
@@ -522,40 +520,45 @@ template<class U>
 enable_if_t<std::is_pod<U>::value == true, 
 bool> Vector<TYPE>::_reserve(size_t requested_size)
 {
+	// TODO: check for extreme values
+
 	const auto _capacity = this->capacity();
+	if( _capacity >= requested_size )
+		return true;
 
-	if(requested_size == 0)
+	size_t bytes_to_allocate = sizeof(TYPE) * requested_size;
+
+	TYPE* const buff = (_capacity != 0) ? (TYPE*) realloc_arr(_data, bytes_to_allocate) 
+                                            : (TYPE*) alloc_arr(bytes_to_allocate);
+
+	if(!buff)
 	{
-		auto evaluated_size = _capacity * 2;
-
-		if(evaluated_size < _capacity)
-		{
-			size_t divisor = 2;
-			do {
-				evaluated_size = _capacity + _capacity/divisor;
-				++divisor;
-			}while(evaluated_size < _capacity);
-		}
-
-		requested_size = evaluated_size;
+		LogError("Failed to reserve memory for Vector");
+		return false;
 	}
 
-	if(_capacity < requested_size) 
-	{
-		TYPE* const buff = (_capacity != 0) ? (TYPE*) realloc_arr(_data, sizeof(TYPE) * requested_size) 
-                                                    :  (TYPE*) alloc_arr(sizeof(TYPE) * requested_size);
-		if(!buff)
-		{
-			LogError("Failed to reserve memory for Vector");
-			return false;
-		}
-
-		_data = buff;
-	}
+	_data = buff;
 
 	return true;
 }
 
+
+template<class TYPE>
+template<class U>
+enable_if_t<std::is_pod<U>::value == true, 
+bool> Vector<TYPE>::_resize(const size_t requested_size)
+{
+	if(_size < requested_size)
+	{
+		if( requested_size >= this->capacity() )
+			if(!this->_reserve(requested_size))
+				return false;
+
+		_size = requested_size;
+	}
+
+	return false;
+}
 
 
 
@@ -635,61 +638,71 @@ template<class U>
 enable_if_t<std::is_pod<U>::value == false, 
 bool> Vector<TYPE>::_reserve(size_t requested_size)
 {
+	// TODO: checks for extreme values and treat it properly
+
 	const auto _capacity = this->capacity();
+	if( _capacity >= requested_size )
+		return true;
 
-	if(requested_size == 0)
+	size_t bytes_to_allocate = sizeof(TYPE) * requested_size;
+
+	TYPE* const buff = (TYPE*) alloc_arr( bytes_to_allocate );
+
+	if(!buff) 
 	{
-		auto evaluated_size = _capacity * 2;	
-
-		if(evaluated_size < _capacity)
-		{
-			size_t divisor = 2;
-			do {
-				evaluated_size = _capacity + _capacity/divisor;
-				++divisor;
-			}while(evaluated_size < _capacity);
-		}
-
-		requested_size = evaluated_size;
+		LogError("Failed to reserve memory for Vector");
+		return false;
 	}
 
-	if(_capacity < requested_size) 
+
+	if(_data) 
 	{
-		TYPE* const buff = (TYPE*) alloc_arr(sizeof(TYPE) * requested_size);
-		
-		if(!buff) 
-		{
-			LogError("Failed to reserve memory for Vector");
-			return false;
+		// need copy _data to new memory block pointed by buff
+		try {
+			this->_fill_move(buff, _data, this->size());
+		}
+		catch(...) {
+			// if exception is thrown, keeps the old _data
+			// and free buff
+			free_arr(buff);
+			throw;
 		}
 
-
-		if(_data) 
-		{
-			// need copy _data to new memory block pointed by buff
-			try {
-					this->_fill_move(buff, _data, this->size());
-			}
-			catch(...) {
-				// if exception is thrown, keeps the old _data
-				// and free buff
-				free_arr(buff);
-				throw;
-			}
-
-			// if success then erase the old _data
-			_call_destructors(this->begin(), this->end());
-			free_arr(_data);
-		}
-
-		_data = buff;
+		// if success then erase the old _data
+		_call_destructors(this->begin(), this->end());
+		free_arr(_data);
 	}
 
+	_data = buff;
 
 	return true;	
 }
 
 
+
+
+template<class TYPE>
+template<class U>
+enable_if_t<std::is_pod<U>::value == false, 
+bool> Vector<TYPE>::_resize(const size_t requested_size)
+{
+	if(_size < requested_size)
+	{
+		if( requested_size >= this->capacity() )
+			if(!this->_reserve(requested_size))
+				return false;
+
+		auto itr = _data + _size;
+		const auto end = _data + requested_size;
+
+		for( ; itr != end; ++itr)
+			new(itr) TYPE();
+
+		_size = requested_size;
+	}
+
+	return false;
+}
 
 
 
