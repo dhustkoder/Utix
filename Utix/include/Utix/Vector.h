@@ -542,11 +542,16 @@ bool> Vector<TYPE>::_reserve(size_t requested_size)
 	const auto _capacity = this->capacity();
 
 	// if requested size is 0, grow current _capacity by 2
-	if( requested_size == 0 )
+	if( requested_size == 0 ) {
 		requested_size = _capacity * 2;
-
-	else if( _capacity >= requested_size )
+		if( requested_size < _capacity ) {
+			LogError("Can't grow Vector");
+			return false;
+		}
+	}
+	else if( _capacity >= requested_size ) {
 		return true;
+	}
 
 	size_t bytes_to_allocate = sizeof(TYPE) * requested_size;
 
@@ -671,10 +676,16 @@ bool> Vector<TYPE>::_reserve(size_t requested_size)
 	const auto _capacity = this->capacity();
 
 	// if requested size is 0, grow current _capacity by 2
-	if( requested_size == 0 )
+	if( requested_size == 0 ) {
 		requested_size = _capacity * 2;
-	else if( _capacity >= requested_size )
+		if( requested_size < _capacity ) {
+			LogError("Can't grow Vector");
+			return false;
+		}
+	}
+	else if( _capacity >= requested_size ) {
 		return true;
+	}
 
 	size_t bytes_to_allocate = sizeof(TYPE) * requested_size;
 
