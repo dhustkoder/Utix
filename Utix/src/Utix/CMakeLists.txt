@@ -6,7 +6,7 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions -fno-rtti")
 
 
 file(GLOB_RECURSE SRC ./*.cpp)
-file(GLOB_RECURSE HEADERS XChip/*.h)
+file(GLOB_RECURSE HEADERS ${UTIX_INCLUDE_DIR}/Utix/*.h)
 add_library(${PROJECT_NAME} ${HEADERS} ${SRC})
 target_link_libraries(${PROJECT_NAME} -ldl)
 
