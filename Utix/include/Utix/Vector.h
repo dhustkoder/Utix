@@ -493,26 +493,30 @@ inline void Vector<TYPE>::free() noexcept
 template<class TYPE>
 template<class U>
 inline enable_if_t<std::is_pod<U>::value == true, 
-bool> Vector<TYPE>::_reserve(const size_t size)
+bool> Vector<TYPE>::_reserve(const size_t sizeToReserve)
 {
 	const auto _capacity = this->capacity();
 	
 	TYPE* buff = nullptr;
 
-	if(_capacity == 0)
-		buff = (TYPE*) alloc_arr(sizeof(TYPE) * size);
-	else if(_capacity < size)
-		buff = (TYPE*) realloc_arr(_data, sizeof(TYPE) * size);
-
-
-	if(buff)
+	if(_capacity < sizeToReserve) 
 	{
-		_data = buff;
-		return true;
+		
+		if(_capacity != 0)
+			buff = (TYPE*) realloc_arr(_data, sizeof(TYPE) * sizeToReserve);
+		else
+			buff = (TYPE*) alloc_arr(sizeof(TYPE) * sizeToReserve);
+	
+
+		if(buff == nullptr) 
+		{
+			LogError("Failed to reserve memory for Vector");
+			return false;
+		}
 	}
 
-	LogError("Failed to reserve memory for Vector");
-	return false;
+	_data = buff;
+	return true;
 }
 
 
@@ -526,40 +530,38 @@ bool> Vector<TYPE>::_reserve(const size_t sizeToReserve)
 	
 	TYPE* buff = nullptr;
 
-	if(_capacity < sizeToReserve)
-		buff = (TYPE*) alloc_arr(sizeof(TYPE) * sizeToReserve);
-
-
-	if(buff)
+	if(_capacity < sizeToReserve) 
 	{
-		if(_data) 
+		buff = (TYPE*) alloc_arr(sizeof(TYPE) * sizeToReserve);
+		
+		if(buff == nullptr) 
 		{
-			size_t i = 0;
-
-			try {
-				
-				const auto elementsToTransfer = this->size();
-				for(; i < elementsToTransfer; ++i)
-					new(buff + i) TYPE(std::move_if_noexcept(_data[i]));
-			}
-			catch(...) {
-				// if exception is thrown, keeps the old _data
-				_call_destructors(buff, buff+i);
-				free_arr(buff);
-				throw;
-			}
-
-			// if success then erase the _data
-			_call_destructors(_data, _data + _size);
-			free_arr(_data);
+			LogError("Failed to reserve memory for Vector");
+			return false;
 		}
-
-		_data = buff;
-		return true;
 	}
 
-	LogError("Failed to reserve memory for Vector");
-	return false;
+
+	if(_data) 
+	{
+		// need copy _data to new memory block pointed by buff
+		try {
+				this->_fill_move(buff, _data, this->size());
+		}
+		catch(...) {
+			// if exception is thrown, keeps the old _data
+			// and free buff
+			free_arr(buff);
+			throw;
+		}
+
+		// if success then erase the old _data
+		_call_destructors(this->begin(), this->end());
+		free_arr(_data);
+	}
+
+	_data = buff;
+	return true;	
 }
 
 
@@ -587,12 +589,24 @@ template<class U>
 inline enable_if_t<std::is_pod<U>::value == false> 
 Vector<TYPE>::_fill(TYPE* dest, const TYPE* src, const size_t size)
 {
-	const auto end = dest + size;
-	while(dest != end) 
-	{
-		new(dest) TYPE((*src));
-		++dest;
-		++src;
+	auto destItr = dest;
+	const auto destEnd = dest + size;
+	
+	try {
+	
+		while(destItr != destEnd) 
+		{
+			new(destItr) TYPE((*src));
+			++destItr;
+			++src;
+		}
+	}
+
+	catch(...) {
+		// exception was thrown, destroy the data
+		// that has been copied.
+		_call_destructors(dest, destItr);
+		throw;
 	}
 }
 
@@ -613,12 +627,22 @@ template<class U>
 inline enable_if_t<std::is_pod<U>::value == false> 
 Vector<TYPE>::_fill_move(TYPE* dest, TYPE* src, const size_t size)
 {
-	const auto end = dest + size;
-	while(dest != end) 
-	{
-		new(dest) TYPE(move(*src));
-		++dest;
-		++src;
+	auto destItr = dest;
+	const auto destEnd = dest + size;
+
+	try {
+		while(destItr != destEnd) 
+		{
+			new(destItr) TYPE(std::move_if_noexcept(*src));
+			++destItr;
+			++src;
+		}
+	}
+	catch(...) {
+		// exception was thrown, destroy the data
+		// that has been copied.
+		_call_destructors(dest, destItr);
+		throw;
 	}
 }
 

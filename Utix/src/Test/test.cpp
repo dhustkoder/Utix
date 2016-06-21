@@ -67,8 +67,9 @@ int main()
 
 
 	Vector<NonPod> nonPodV;
+	std::initializer_list<NonPod> x = {10,20,30,40,50,60,70,80,90};
 	try {
-		nonPodV.initialize({10,20,30,40,50,60,70,80,90});
+		nonPodV.initialize(std::move(x));
 	
 
 
