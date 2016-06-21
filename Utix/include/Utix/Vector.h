@@ -91,14 +91,16 @@ public:
 
 
 private:
+
+	// pod functions
+
+	template<class U = TYPE, class ...Args>
+	enable_if_t<std::is_pod<U>::value == true> 
+	_insert_back(Args&& ...args);
+
 	template<class U = TYPE>
 	enable_if_t<std::is_pod<U>::value == true, 
-	bool> _reserve(const size_t size);
-
-	template<class U = TYPE>
-	enable_if_t<std::is_pod<U>::value == false, 
-	bool> _reserve(const size_t size);
-
+	bool> _reserve(size_t requested_size = 0);
 
 	template<class U = TYPE>
 	enable_if_t<std::is_pod<U>::value == true> 
@@ -106,39 +108,39 @@ private:
 
 
 	template<class U = TYPE>
-	enable_if_t<std::is_pod<U>::value == false> 
-	_fill(TYPE* dest, const TYPE* src, const size_t size);
-
-
-	template<class U = TYPE>
 	enable_if_t<std::is_pod<U>::value == true> 
 	_fill_move(TYPE* dest, TYPE* src, const size_t size);
 
-
-	template<class U = TYPE>
-	enable_if_t<std::is_pod<U>::value == false> 
-	_fill_move(TYPE* dest, TYPE* src, const size_t size);
-
-
-	template<class U = TYPE, class T>
-	enable_if_t<std::is_pod<U>::value == true,
-	bool> _push_back(T&& t);
-
-	template<class U = TYPE, class T>
-	enable_if_t<std::is_pod<U>::value == false,
-	bool> _push_back(T&& t);
-	
-	template<class U = TYPE, class ...Args>
-	enable_if_t<std::is_pod<U>::value == true,
-	bool> _emplace_back(Args&& ...args);
-
-	template<class U = TYPE, class ...Args>
-	enable_if_t<std::is_pod<U>::value == false,
-	bool> _emplace_back(Args&& ...args);
 
 	template<class U = TYPE>
 	enable_if_t<std::is_pod<U>::value == true,
 	void> _free() noexcept;
+
+
+
+	
+
+	// Non-Pod functions
+
+	template<class U = TYPE, class ...Args>
+	enable_if_t<std::is_pod<U>::value == false> 
+	_insert_back(Args&& ...args);
+
+
+	template<class U = TYPE>
+	enable_if_t<std::is_pod<U>::value == false, 
+	bool> _reserve(size_t requested_size = 0);
+
+
+	template<class U = TYPE>
+	enable_if_t<std::is_pod<U>::value == false> 
+	_fill(TYPE* dest, const TYPE* src, const size_t size);
+
+
+	template<class U = TYPE>
+	enable_if_t<std::is_pod<U>::value == false> 
+	_fill_move(TYPE* dest, TYPE* src, const size_t size);
+
 
 	template<class U = TYPE>
 	enable_if_t<std::is_pod<U>::value == false,
@@ -174,7 +176,7 @@ Vector<TYPE>::Vector(Vector&& other) noexcept
 template<class TYPE>
 Vector<TYPE>::~Vector()
 {
-	this->free();
+	this->_free();
 }
 
 
@@ -264,7 +266,7 @@ inline const TYPE& Vector<TYPE>::operator[](size_t offset) const
 template<class TYPE>
 inline bool Vector<TYPE>::initialize(const size_t vectorSize)
 {
-	if (this->reserve(vectorSize > 0 ? vectorSize : 10))
+	if (this->_reserve(vectorSize > 0 ? vectorSize : 10))
 		return true;
 
 	return false;
@@ -279,7 +281,7 @@ bool Vector<TYPE>::initialize(const TYPE* array, const size_t arraySize)
 {
 	if(arraySize)
 	{
-		if(!this->reserve(arraySize))
+		if(!this->_reserve(arraySize))
 			return false;
 
 		this->_fill(_data, array, arraySize);
@@ -293,13 +295,13 @@ bool Vector<TYPE>::initialize(const TYPE* array, const size_t arraySize)
 
 
 template<class TYPE>
-inline bool Vector<TYPE>::initialize(const Vector& other)
+bool Vector<TYPE>::initialize(const Vector& other)
 {
 	const auto otherSize = other.size();
 	
 	if(otherSize)
 	{
-		if(!this->reserve(other.capacity()))
+		if(!this->_reserve(other.capacity()))
 			return false;
 		
 		this->_fill(this->_data, other._data, otherSize);
@@ -386,13 +388,23 @@ inline TYPE& Vector<TYPE>::operator[](size_t offset)
 template<class TYPE>
 bool Vector<TYPE>::push_back(const TYPE& type)
 {
-	return _push_back(type);
+	if( _size >= this->capacity() )
+		if(!this->_reserve())
+			return false;
+
+	this->_insert_back(type);
+	return true;
 }
 
 template<class TYPE>
 bool Vector<TYPE>::push_back(TYPE&& type)
 {
-	return _push_back(move(type));
+	if( _size >= this->capacity() )
+		if(!this->_reserve())
+			return false;
+
+	this->_insert_back(std::move(type));
+	return true;
 }
 
 
@@ -400,7 +412,12 @@ template<class TYPE>
 template<class ...Args>
 bool Vector<TYPE>::emplace_back(Args&& ...args)
 {
-	return _emplace_back(forward<Args>(args)...);
+	if( _size >= this->capacity() )
+		if(!this->_reserve())
+			return false;
+
+	this->_insert_back(std::forward<Args>(args)...);
+	return true;
 }
 
 
@@ -413,19 +430,25 @@ void Vector<TYPE>::clear()
 
 
 
+
 template<class TYPE>
-inline bool Vector<TYPE>::reserve(const size_t size)
+bool Vector<TYPE>::reserve(const size_t size)
 {
 	return _reserve(size);
 }
 
+
+
 template<class TYPE>
-bool Vector<TYPE>::resize(const size_t size)
+bool Vector<TYPE>::resize(const size_t requested_size)
 {
-	if(this->reserve(size))
+	if(_size < requested_size-1)
 	{
-		_size = size;
-		return true;
+		if( requested_size >= this->capacity())
+			if(!this->_reserve(requested_size))
+				return false;
+
+		_size = requested_size-1;
 	}
 
 	return false;
@@ -435,29 +458,11 @@ bool Vector<TYPE>::resize(const size_t size)
 
 
 
-
-
 template<class TYPE>
 bool Vector<TYPE>::copy(const Vector& other)
 {
-	if(this != &other)
-	{
-		Vector<TYPE> tmp;
-		
-		if( tmp.initialize(other._data, other.capacity()) )
-		{
-			this->swap(tmp);
-			return true;
-		}
-		
-		return false;
-	}
-
-	return true;
+	return this->initialize(other);
 }
-
-
-
 
 
 
@@ -490,78 +495,65 @@ inline void Vector<TYPE>::free() noexcept
 
 
 
+
+
+
+
+
+
+
+// Pod functions
+
 template<class TYPE>
-template<class U>
-inline enable_if_t<std::is_pod<U>::value == true, 
-bool> Vector<TYPE>::_reserve(const size_t sizeToReserve)
+template<class U, class ...Args>
+inline enable_if_t<std::is_pod<U>::value == true> 
+Vector<TYPE>::_insert_back(Args&& ...args)
 {
-	const auto _capacity = this->capacity();
-	
-	TYPE* buff = nullptr;
-
-	if(_capacity < sizeToReserve) 
-	{
-		
-		if(_capacity != 0)
-			buff = (TYPE*) realloc_arr(_data, sizeof(TYPE) * sizeToReserve);
-		else
-			buff = (TYPE*) alloc_arr(sizeof(TYPE) * sizeToReserve);
-	
-
-		if(buff == nullptr) 
-		{
-			LogError("Failed to reserve memory for Vector");
-			return false;
-		}
-	}
-
-	_data = buff;
-	return true;
+	_data[_size++] = { std::forward<Args>(args)... };
 }
 
 
 
+
+
+
 template<class TYPE>
 template<class U>
-inline enable_if_t<std::is_pod<U>::value == false, 
-bool> Vector<TYPE>::_reserve(const size_t sizeToReserve)
+enable_if_t<std::is_pod<U>::value == true, 
+bool> Vector<TYPE>::_reserve(size_t requested_size)
 {
 	const auto _capacity = this->capacity();
-	
-	TYPE* buff = nullptr;
 
-	if(_capacity < sizeToReserve) 
+	if(requested_size == 0)
 	{
-		buff = (TYPE*) alloc_arr(sizeof(TYPE) * sizeToReserve);
-		
-		if(buff == nullptr) 
+		auto evaluated_size = _capacity * 2;
+
+		if(evaluated_size < _capacity)
+		{
+			size_t divisor = 2;
+			do {
+				evaluated_size = _capacity + _capacity/divisor;
+				++divisor;
+			}while(evaluated_size < _capacity);
+		}
+
+		requested_size = evaluated_size;
+	}
+
+	if(_capacity < requested_size) 
+	{
+		TYPE* const buff = (_capacity != 0) ? (TYPE*) realloc_arr(_data, sizeof(TYPE) * requested_size) 
+                                                    :  (TYPE*) alloc_arr(sizeof(TYPE) * requested_size);
+		if(!buff)
 		{
 			LogError("Failed to reserve memory for Vector");
 			return false;
 		}
+
+		_data = buff;
 	}
 
-
-	if(_data) 
-	{
-		// need copy _data to new memory block pointed by buff
-		try {
-				this->_fill_move(buff, _data, this->size());
-		}
-		catch(...) {
-			// if exception is thrown, keeps the old _data
-			// and free buff
-			free_arr(buff);
-			throw;
-		}
-
-		// if success then erase the old _data
-		_call_destructors(this->begin(), this->end());
-		free_arr(_data);
-	}
-
-	_data = buff;
-	return true;	
+	return true;
 }
 
 
@@ -584,6 +576,124 @@ Vector<TYPE>::_fill(TYPE* dest, const TYPE* src, const size_t size)
 }
 
 
+
+template<class TYPE>
+template<class U>
+inline enable_if_t<std::is_pod<U>::value == true> 
+Vector<TYPE>::_fill_move(TYPE* dest, TYPE* src, const size_t size)
+{
+	// pod types don't care about moving
+	this->_fill(dest, src, size);
+}
+
+
+
+
+
+
+template<class TYPE>
+template<class U>
+inline enable_if_t<std::is_pod<U>::value == true,
+void> Vector<TYPE>::_free() noexcept
+{
+	if(_data)
+	{
+		free_arr(_data);
+		_data = nullptr;
+		_size = 0;
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Non-Pod functions
+
+
+template<class TYPE>
+template<class U, class ...Args>
+inline enable_if_t<std::is_pod<U>::value == false> 
+Vector<TYPE>::_insert_back(Args&& ...args)
+{
+	new(_data + _size) TYPE(std::forward<Args>(args)...);
+	++_size;
+}
+
+
+
+template<class TYPE>
+template<class U>
+enable_if_t<std::is_pod<U>::value == false, 
+bool> Vector<TYPE>::_reserve(size_t requested_size)
+{
+	const auto _capacity = this->capacity();
+
+	if(requested_size == 0)
+	{
+		auto evaluated_size = _capacity * 2;	
+
+		if(evaluated_size < _capacity)
+		{
+			size_t divisor = 2;
+			do {
+				evaluated_size = _capacity + _capacity/divisor;
+				++divisor;
+			}while(evaluated_size < _capacity);
+		}
+
+		requested_size = evaluated_size;
+	}
+
+	if(_capacity < requested_size) 
+	{
+		TYPE* const buff = (TYPE*) alloc_arr(sizeof(TYPE) * requested_size);
+		
+		if(!buff) 
+		{
+			LogError("Failed to reserve memory for Vector");
+			return false;
+		}
+
+
+		if(_data) 
+		{
+			// need copy _data to new memory block pointed by buff
+			try {
+					this->_fill_move(buff, _data, this->size());
+			}
+			catch(...) {
+				// if exception is thrown, keeps the old _data
+				// and free buff
+				free_arr(buff);
+				throw;
+			}
+
+			// if success then erase the old _data
+			_call_destructors(this->begin(), this->end());
+			free_arr(_data);
+		}
+
+		_data = buff;
+	}
+
+
+	return true;	
+}
+
+
+
+
+
+
 template<class TYPE>
 template<class U>
 inline enable_if_t<std::is_pod<U>::value == false> 
@@ -601,7 +711,6 @@ Vector<TYPE>::_fill(TYPE* dest, const TYPE* src, const size_t size)
 			++src;
 		}
 	}
-
 	catch(...) {
 		// exception was thrown, destroy the data
 		// that has been copied.
@@ -612,14 +721,10 @@ Vector<TYPE>::_fill(TYPE* dest, const TYPE* src, const size_t size)
 
 
 
-template<class TYPE>
-template<class U>
-inline enable_if_t<std::is_pod<U>::value == true> 
-Vector<TYPE>::_fill_move(TYPE* dest, TYPE* src, const size_t size)
-{
-	// pod types don't care about moving
-	this->_fill(dest, src, size);
-}
+
+
+
+
 
 
 template<class TYPE>
@@ -650,90 +755,6 @@ Vector<TYPE>::_fill_move(TYPE* dest, TYPE* src, const size_t size)
 
 
 
-template<class TYPE>
-template<class U, class T>
-inline enable_if_t<std::is_pod<U>::value == true,
-bool> Vector<TYPE>::_push_back(T&& t)
-{
-	if( _size >= this->capacity() )
-		if(!this->reserve(_size))
-			return false;
-
-	_data[_size++] = t;
-	return false;
-}
-
-
-
-
-
-template<class TYPE>
-template<class U, class T>
-inline enable_if_t<std::is_pod<U>::value == false,
-bool> Vector<TYPE>::_push_back(T&& t)
-{
-	if( _size >= this->capacity() )
-		if(!this->reserve(_size))
-			return false;
-
-	new(_data + _size) TYPE(forward<U>(t));
-	++_size;
-
-	return false;
-
-}
-
-
-
-template<class TYPE>
-template<class U, class ...Args>
-inline enable_if_t<std::is_pod<U>::value == true,
-bool> Vector<TYPE>::_emplace_back(Args&& ...args)
-{
-	if( _size >= this->capacity() )
-		if(!this->reserve(_size*2))
-			return false;
-
-	_data[_size++] = { forward<Args>(args)...};
-	return true;
-}
-
-
-
-
-template<class TYPE>
-template<class U, class ...Args>
-inline enable_if_t<std::is_pod<U>::value == false,
-bool> Vector<TYPE>::_emplace_back(Args&& ...args)
-{
-	if( _size >= this->capacity() )
-		if(!this->reserve(_size*2))
-			return false;
-
-	new (_data + _size) TYPE(forward<Args>(args)...);
-	++_size;
-	return false;
-}
-
-
-
-
-
-
-
-
-template<class TYPE>
-template<class U>
-inline enable_if_t<std::is_pod<U>::value == true,
-void> Vector<TYPE>::_free() noexcept
-{
-	if(_data)
-	{
-		free_arr(_data);
-		_data = nullptr;
-		_size = 0;
-	}
-}
 
 template<class TYPE>
 template<class U>
