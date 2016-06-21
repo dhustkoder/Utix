@@ -173,7 +173,7 @@ private:
 
 
 template<class TYPE>
-Vector<TYPE>::Vector(Vector&& other) noexcept
+inline Vector<TYPE>::Vector(Vector&& other) noexcept
 	: _data(other._data),
 	_size(other._size)
 {
@@ -183,14 +183,14 @@ Vector<TYPE>::Vector(Vector&& other) noexcept
 
 
 template<class TYPE>
-Vector<TYPE>::~Vector()
+inline Vector<TYPE>::~Vector()
 {
 	this->_free();
 }
 
 
 template<class TYPE>
-Vector<TYPE>& Vector<TYPE>::operator=(Vector&& other) noexcept
+inline Vector<TYPE>& Vector<TYPE>::operator=(Vector&& other) noexcept
 {
 	this->swap(other);
 }
@@ -355,7 +355,7 @@ inline bool Vector<TYPE>::initialize(const TYPE(&data)[sz])
 
 template<class TYPE>
 template<size_t sz>
-inline bool Vector<TYPE>::initialize(TYPE(&&data)[sz])
+bool Vector<TYPE>::initialize(TYPE(&&data)[sz])
 {
 	if( this->_reserve(sz) )
 	{
@@ -410,7 +410,7 @@ inline TYPE& Vector<TYPE>::operator[](size_t offset)
 
 
 template<class TYPE>
-bool Vector<TYPE>::push_back(const TYPE& type)
+inline bool Vector<TYPE>::push_back(const TYPE& type)
 {
 	if( _size >= this->capacity() )
 		if(!this->_reserve())
@@ -421,7 +421,7 @@ bool Vector<TYPE>::push_back(const TYPE& type)
 }
 
 template<class TYPE>
-bool Vector<TYPE>::push_back(TYPE&& type)
+inline bool Vector<TYPE>::push_back(TYPE&& type)
 {
 	if( _size >= this->capacity() )
 		if(!this->_reserve())
@@ -434,7 +434,7 @@ bool Vector<TYPE>::push_back(TYPE&& type)
 
 template<class TYPE>
 template<class ...Args>
-bool Vector<TYPE>::emplace_back(Args&& ...args)
+inline bool Vector<TYPE>::emplace_back(Args&& ...args)
 {
 	if( _size >= this->capacity() )
 		if(!this->_reserve())
@@ -456,7 +456,7 @@ void Vector<TYPE>::clear()
 
 
 template<class TYPE>
-bool Vector<TYPE>::reserve(const size_t size)
+inline bool Vector<TYPE>::reserve(const size_t size)
 {
 	return _reserve(size);
 }
@@ -464,7 +464,7 @@ bool Vector<TYPE>::reserve(const size_t size)
 
 
 template<class TYPE>
-bool Vector<TYPE>::resize(const size_t requested_size)
+inline bool Vector<TYPE>::resize(const size_t requested_size)
 {
 	return _resize(requested_size);
 }
@@ -474,7 +474,7 @@ bool Vector<TYPE>::resize(const size_t requested_size)
 
 
 template<class TYPE>
-bool Vector<TYPE>::copy(const Vector& other)
+inline bool Vector<TYPE>::copy(const Vector& other)
 {
 	return this->initialize(other);
 }
@@ -484,7 +484,7 @@ bool Vector<TYPE>::copy(const Vector& other)
 
 
 template<class TYPE>
-void Vector<TYPE>::swap(Vector& other) noexcept
+inline void Vector<TYPE>::swap(Vector& other) noexcept
 {
 	if( this != &other )
 	{
