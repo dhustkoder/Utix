@@ -37,19 +37,19 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
  
 namespace utix {
 
-
-namespace literals {
-	constexpr std::chrono::microseconds operator""_sec(unsigned long long x) { return std::chrono::seconds(x); }
-	constexpr std::chrono::microseconds operator""_milli(unsigned long long x) { return std::chrono::milliseconds(x); }
-	constexpr std::chrono::microseconds operator""_micro(unsigned long long x) { return std::chrono::microseconds(x); }
-	constexpr std::chrono::nanoseconds operator""_nano(unsigned long long x) { return std::chrono::nanoseconds(x); }
-	constexpr std::chrono::microseconds operator""_hz(unsigned long long x) { return 1_sec / x; }
-}
-
+using Milli = std::chrono::milliseconds;
 using Micro = std::chrono::microseconds;
 using Nano = std::chrono::nanoseconds;
 using Duration = std::chrono::duration<long long, std::nano>;
-using std::chrono::duration_cast;
+
+namespace literals {
+	constexpr Micro operator""_sec(unsigned long long x) { return std::chrono::seconds(x); }
+	constexpr Micro operator""_milli(unsigned long long x) { return std::chrono::milliseconds(x); }
+	constexpr Micro operator""_micro(unsigned long long x) { return std::chrono::microseconds(x); }
+	constexpr Micro operator""_hz(unsigned long long x) { return 1_sec / x; }
+	constexpr Nano operator""_nano(unsigned long long x) { return std::chrono::nanoseconds(x); }
+}
+
 
 
 class Timer
@@ -96,6 +96,7 @@ inline int Timer::GetTargetHz() const { return static_cast<int>(literals::operat
 
 inline Duration Timer::GetRemain() const
 {
+	//using namespace std::chrono;
 	using namespace std::chrono;
 	const auto passedTime = duration_cast<Duration>(steady_clock::now() - m_startPoint);
 	return passedTime < m_target ? (m_target - passedTime) : Duration(0);

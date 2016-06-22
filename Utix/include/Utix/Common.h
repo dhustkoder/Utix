@@ -63,8 +63,8 @@ inline void Sleep(const Nano& nano)
           LogError("nanosleep error");
      
 #elif _WIN32 
-	Sleep(static_cast<DWORD>(duration_cast<milliseconds>(nano).count()));
-
+	using namespace std::chrono;
+	::Sleep(static_cast<DWORD>(duration_cast<Milli>(nano).count()));
 #endif
 }
 
