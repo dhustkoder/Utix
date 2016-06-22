@@ -24,8 +24,6 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 #ifndef _UTIX_VECTOR_H_
 #define _UTIX_VECTOR_H_
 
-#include <cstdlib>
-#include <cstring>
 #include <initializer_list>
 #include "Traits.h"
 #include "Alloc.h"
@@ -86,11 +84,8 @@ public:
 	TYPE* data();
 	TYPE& operator[](size_t offset);
 
-	bool copy(const Vector& other);
 	void swap(Vector& other) noexcept;
 	void free() noexcept;
-
-
 
 private:
 
@@ -98,6 +93,10 @@ private:
 	template<class U = TYPE, class ...Args>
 	enable_if_t<std::is_pod<U>::value == true> 
 	_insert_back(Args&& ...args);
+
+	template<class U = TYPE>
+	enable_if_t<std::is_pod<U>::value == true> 
+	_clear();
 
 	template<class U = TYPE>
 	enable_if_t<std::is_pod<U>::value == true, 
@@ -132,6 +131,9 @@ private:
 	enable_if_t<std::is_pod<U>::value == false> 
 	_insert_back(Args&& ...args);
 
+	template<class U = TYPE>
+	enable_if_t<std::is_pod<U>::value == false> 
+	_clear();
 
 	template<class U = TYPE>
 	enable_if_t<std::is_pod<U>::value == false, 
@@ -275,7 +277,8 @@ inline const TYPE& Vector<TYPE>::operator[](size_t offset) const
 template<class TYPE>
 inline bool Vector<TYPE>::initialize(const size_t vectorSize)
 {
-	if (this->_reserve(vectorSize > 0 ? vectorSize : 10))
+	this->_free();
+	if (this->_reserve(vectorSize > 0 ? vectorSize : 4))
 		return true;
 
 	return false;
@@ -288,16 +291,14 @@ inline bool Vector<TYPE>::initialize(const size_t vectorSize)
 template<class TYPE>
 bool Vector<TYPE>::initialize(const TYPE* array, const size_t arraySize)
 {
-	if(arraySize)
+	if(this->initialize(arraySize))
 	{
-		if(!this->_reserve(arraySize))
-			return false;
-
 		this->_fill(_data, array, arraySize);
 		_size = arraySize;
+		return true;
 	}
 
-	return true;
+	return false;
 }
 
 
@@ -307,17 +308,14 @@ template<class TYPE>
 bool Vector<TYPE>::initialize(const Vector& other)
 {
 	const auto otherSize = other.size();
-	
-	if(otherSize)
-	{
-		if(!this->_reserve(other.capacity()))
-			return false;
-		
+	if(this->initialize(otherSize))
+	{	
 		this->_fill(this->_data, other._data, otherSize);
 		_size = otherSize;
+		return true;
 	}
 
-	return true;
+	return false;
 }
 
 
@@ -355,9 +353,9 @@ inline bool Vector<TYPE>::initialize(const TYPE(&data)[sz])
 
 template<class TYPE>
 template<size_t sz>
-bool Vector<TYPE>::initialize(TYPE(&&data)[sz])
+inline bool Vector<TYPE>::initialize(TYPE(&&data)[sz])
 {
-	if( this->_reserve(sz) )
+	if( this->initialize(sz) )
 	{
 		this->_fill_move(_data, data, sz);
 		this->_size = sz;
@@ -447,9 +445,9 @@ inline bool Vector<TYPE>::emplace_back(Args&& ...args)
 
 
 template<class TYPE>
-void Vector<TYPE>::clear()
+inline void Vector<TYPE>::clear()
 {
-	_size = 0;
+	this->_clear();
 }
 
 
@@ -469,15 +467,6 @@ inline bool Vector<TYPE>::resize(const size_t requested_size)
 	return _resize(requested_size);
 }
 
-
-
-
-
-template<class TYPE>
-inline bool Vector<TYPE>::copy(const Vector& other)
-{
-	return this->initialize(other);
-}
 
 
 
@@ -529,7 +518,13 @@ Vector<TYPE>::_insert_back(Args&& ...args)
 
 
 
-
+template<class TYPE>
+template<class U>
+inline enable_if_t<std::is_pod<U>::value == true> 
+Vector<TYPE>::_clear()
+{
+	_size = 0;
+}
 
 
 template<class TYPE>
@@ -665,6 +660,14 @@ Vector<TYPE>::_insert_back(Args&& ...args)
 }
 
 
+template<class TYPE>
+template<class U>
+inline enable_if_t<std::is_pod<U>::value == false> 
+Vector<TYPE>::_clear()
+{
+	_call_destructors(this->begin(), this->end());
+	_size = 0;
+}
 
 template<class TYPE>
 template<class U>
@@ -826,7 +829,7 @@ void> Vector<TYPE>::_free() noexcept
 {
 	if(_data)
 	{
-		_call_destructors(_data, _data + this->size());
+		_call_destructors(this->begin(), this->end());
 		free_arr(_data);
 		_data = nullptr;
 		_size = 0;

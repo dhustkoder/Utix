@@ -1,5 +1,7 @@
 #include <cstdio>
+#include <cstdlib>
 #include <stdexcept>
+#include <vector>
 #include <Utix/Log.h>
 #include <Utix/Vector.h>
 
@@ -11,19 +13,20 @@ struct NonPod
 	NonPod() : id(s_i++) { Log("Constructor Of NonPod %d", id); }
 	NonPod(int x) : id(x) { Log("Int constructor called With Id: %d", id); }
 
-	NonPod(const NonPod& o) : id(o.id) 
-	{ 
-		Log("Copy ctor for NonPods %d", id);
+	NonPod(const NonPod& o) : id(o.id) { Log("Copy ctor"); }
 
-//		if(id==20) 
-//			throw std::runtime_error("ERR"); 
+	NonPod(NonPod&& o) noexcept : id(o.id), buffer(o.buffer) { 
+		o.buffer = nullptr;
+		o.id=-o.id; Log("Move ctor of NonPods %d", id);
 	}
-
-	NonPod(NonPod&& o) noexcept : id(o.id) { o.id=-o.id; Log("Move ctor of NonPods %d", id); }
-	~NonPod() { Log("Destructor Of NonPod %d", id); } 
+	~NonPod() { 
+		Log("Destructor Of NonPod %d", id);
+		std::free(buffer);
+	} 
 
 	volatile int id;
 	volatile static int s_i;
+	int * buffer = { (int*) std::malloc(1000) } ;
 };
 
 volatile int NonPod::s_i = 1;
@@ -33,14 +36,27 @@ volatile int NonPod::s_i = 1;
 int main()
 {
 	Log("Hello Utix test");
-	Vector<NonPod> v;
+//	std::vector<NonPod> v;
+ 	Vector<NonPod> v, v2;
 
-//	v.initialize ( { 10, 20 ,30 ,40 , 50 } );
-	NonPod x[] = { 10 , 20 ,30 ,40 , 50 };
-	v.initialize(std::move(x));
+	v.initialize({10,20,30});
 
+	v2.initialize(v);
+	v.initialize(v2);
+	v2.initialize(v);
+	v.initialize(v2);
+
+
+	Log("printing V:");
 
 	for(auto &x : v )
+		Log("%d", x.id);
+
+
+
+	Log("printing V2:");
+
+	for(auto &x : v2 )
 		Log("%d", x.id);
 
 
