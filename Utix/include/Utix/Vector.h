@@ -573,7 +573,7 @@ bool> Vector<TYPE>::_reserve(size_t requested_size)
 
 template<class TYPE>
 template<class U>
-enable_if_t<std::is_pod<U>::value == true, 
+inline enable_if_t<std::is_pod<U>::value == true, 
 bool> Vector<TYPE>::_resize(const size_t requested_size)
 {
 	if(_size < requested_size)

@@ -36,15 +36,16 @@ volatile int NonPod::s_i = 1;
 int main()
 {
 	Log("Hello Utix test");
-//	std::vector<NonPod> v;
- 	Vector<NonPod> v, v2;
+
+ 	Vector<NonPod> v,v2;
+
 
 	v.initialize({10,20,30});
 
-	v2.initialize(v);
-	v.initialize(v2);
-	v2.initialize(v);
-	v.initialize(v2);
+	v2.initialize(std::move(v));
+	v.initialize(std::move(v2));
+	v2.initialize(std::move(v));
+	v.initialize(std::move(v2));
 
 
 	Log("printing V:");
@@ -58,8 +59,6 @@ int main()
 
 	for(auto &x : v2 )
 		Log("%d", x.id);
-
-
 
 
 
