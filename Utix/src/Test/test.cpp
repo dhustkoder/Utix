@@ -35,6 +35,7 @@ volatile int NonPod::s_i = 1;
 
 int main()
 {
+	ASSERT_MSG(false, "ASSERT TEST");
 	Log("Hello Utix test");
 
  	Vector<NonPod> v,v2;
