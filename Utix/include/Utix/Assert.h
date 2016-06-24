@@ -22,16 +22,13 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 #define _UTIX_ASSERT_H_
 
 
-#if !_DEBUG
+#ifndef _DEBUG
 // if not debug build, includes nothing.
 #define NDEBUG 1
 #define ASSERT_MSG(cond, msg)
 
 
-
-
 #else
-
 // else, includes...
 #if defined(__linux__) || defined(__APPLE__)
 #include <signal.h>
@@ -66,8 +63,6 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
         _UTIX_DEBUG_BREAK_();                                            \
     }                                                                    \
 }
-
-
 
 
 
