@@ -111,12 +111,12 @@ private:
 
 	template<class U = TYPE>
 	enable_if_t<std::is_pod<U>::value == true> 
-	_fill(TYPE* dest, const TYPE* src, const size_t size);
+	_fill(const TYPE* src, const size_t size, TYPE* dest);
 
 
 	template<class U = TYPE>
 	enable_if_t<std::is_pod<U>::value == true> 
-	_fill_move(TYPE* dest, TYPE* src, const size_t size);
+	_fill_move(TYPE* src, const size_t size, TYPE* dest);
 	
 
 	// Non-Pod functions
@@ -139,12 +139,12 @@ private:
 
 	template<class U = TYPE>
 	enable_if_t<std::is_pod<U>::value == false> 
-	_fill(TYPE* dest, const TYPE* src, const size_t size);
+	_fill(const TYPE* src, const size_t size, TYPE* dest);
 
 
 	template<class U = TYPE>
 	enable_if_t<std::is_pod<U>::value == false> 
-	_fill_move(TYPE* dest, TYPE* src, const size_t size);
+	_fill_move(TYPE* src, const size_t size, TYPE* dest);
 
 
 	template<class U = TYPE>
@@ -283,7 +283,7 @@ bool Vector<TYPE>::initialize(const TYPE* array, const size_t arraySize)
 {
 	if(this->initialize(arraySize))
 	{
-		this->_fill(_data, array, arraySize);
+		this->_fill(array, arraySize, this->_data);
 		_size = arraySize;
 		return true;
 	}
@@ -298,9 +298,10 @@ template<class TYPE>
 bool Vector<TYPE>::initialize(const Vector& other)
 {
 	const auto otherCap = other.capacity();
+
 	if(this->initialize(otherCap))
 	{	
-		this->_fill(this->_data, other._data, other._size);
+		this->_fill(other._data, other._size, this->_data);
 		_size = other._size;
 		return true;
 	}
@@ -335,19 +336,19 @@ inline bool Vector<TYPE>::initialize(std::initializer_list<TYPE> list)
 
 template<class TYPE>
 template<size_t sz>
-inline bool Vector<TYPE>::initialize(const TYPE(&data)[sz])
+inline bool Vector<TYPE>::initialize(const TYPE(&array)[sz])
 {
-	return this->initialize(data, sz);
+	return this->initialize(array, sz);
 }
 
 
 template<class TYPE>
 template<size_t sz>
-inline bool Vector<TYPE>::initialize(TYPE(&&data)[sz])
+inline bool Vector<TYPE>::initialize(TYPE(&&array)[sz])
 {
 	if( this->initialize(sz) )
 	{
-		this->_fill_move(_data, data, sz);
+		this->_fill_move(array, sz, _data);
 		this->_size = sz;
 		return true;
 	}
@@ -610,7 +611,7 @@ bool> Vector<TYPE>::_resize(const size_t requested_size)
 template<class TYPE>
 template<class U>
 inline enable_if_t<std::is_pod<U>::value == true> 
-Vector<TYPE>::_fill(TYPE* dest, const TYPE* src, const size_t size)
+Vector<TYPE>::_fill(const TYPE* src, const size_t size, TYPE* dest)
 {
 	const auto end = dest + size;
 	while(dest != end) 
@@ -626,10 +627,10 @@ Vector<TYPE>::_fill(TYPE* dest, const TYPE* src, const size_t size)
 template<class TYPE>
 template<class U>
 inline enable_if_t<std::is_pod<U>::value == true> 
-Vector<TYPE>::_fill_move(TYPE* dest, TYPE* src, const size_t size)
+Vector<TYPE>::_fill_move(TYPE* src, const size_t size, TYPE* dest)
 {
 	// pod types don't care about moving
-	this->_fill(dest, src, size);
+	this->_fill(src, size, dest);
 }
 
 
@@ -703,7 +704,7 @@ bool> Vector<TYPE>::_reserve(size_t requested_size)
 	{
 		// need copy _data to new memory block pointed by buff
 		try {
-			this->_fill_move(buff, _data, this->size());
+			this->_fill_move(buff, _size, _data);
 		}
 		catch(...) {
 			// if exception is thrown, keeps the old _data
@@ -753,7 +754,7 @@ bool> Vector<TYPE>::_resize(const size_t requested_size)
 template<class TYPE>
 template<class U>
 inline enable_if_t<std::is_pod<U>::value == false> 
-Vector<TYPE>::_fill(TYPE* dest, const TYPE* src, const size_t size)
+Vector<TYPE>::_fill(const TYPE* src, const size_t size, TYPE* dest)
 {
 	auto destItr = dest;
 	const auto destEnd = dest + size;
@@ -788,7 +789,7 @@ Vector<TYPE>::_fill(TYPE* dest, const TYPE* src, const size_t size)
 template<class TYPE>
 template<class U>
 inline enable_if_t<std::is_pod<U>::value == false> 
-Vector<TYPE>::_fill_move(TYPE* dest, TYPE* src, const size_t size)
+Vector<TYPE>::_fill_move(TYPE* src, const size_t size, TYPE* dest)
 {
 	auto destItr = dest;
 	const auto destEnd = dest + size;

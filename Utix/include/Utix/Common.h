@@ -31,22 +31,22 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 namespace utix {
 
 template<class T>
-inline enable_if_t<is_numeric<T>::value> Clamp(T& lval, const T min, const T max)
+inline enable_if_t<is_numeric<T>::value> Clamp(const T min, const T max, T* const lval)
 {
-	if(lval > max)
-		lval = max;
-	else if(lval < min)
-		lval = min;
+	if(*lval > max)
+		*lval = max;
+	else if(*lval < min)
+		*lval = min;
 }
 
 
 template<class T>
-inline enable_if_t<!is_numeric<T>::value> Clamp(T& lval, const T& min, const T& max)
+inline enable_if_t<!is_numeric<T>::value> Clamp(const T& min, const T& max, T* const lval)
 {
-	if(lval > max)
-		lval = max;
-	else if(lval < min)
-		lval = min;
+	if(*lval > max)
+		*lval = max;
+	else if(*lval < min)
+		*lval = min;
 }
 
 
