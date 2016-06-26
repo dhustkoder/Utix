@@ -21,7 +21,6 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 #ifndef _UTIX_ALLOC_H_
 #define _UTIX_ALLOC_H_
-#include <cstdlib>
 #include <cstring>
 #include "Ints.h"
 #include "BaseTraits.h"
@@ -30,11 +29,11 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 namespace utix {
 
 
-
 extern void* alloc_arr(const size_t bytes) noexcept;
 
 extern void* realloc_arr(void* from, const size_t bytes) noexcept;
 
+extern "C" void free(void*);
 
 inline void free_arr(const void* block)
 {

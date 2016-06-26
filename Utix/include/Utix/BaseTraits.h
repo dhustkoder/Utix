@@ -24,6 +24,14 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 namespace utix {
 
+#if __EXCEPTIONS
+     #define _UTIX_TRY_(try_code) try { try_code }
+     #define _UTIX_CATCH_(exception, handle_code) catch(exception) { handle_code }
+#else
+     #define _UTIX_TRY_(try_code) try_code
+     #define _UTIX_CATCH_(exception, handle_code)
+#endif
+
 
 // basic metaprogramming return types: true, false
 struct true_type { static constexpr bool value = true; };

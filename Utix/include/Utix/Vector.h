@@ -60,21 +60,26 @@ public:
 
 
 	bool initialize(const size_t VectorSize = 0);
-	bool initialize(const TYPE* data, const size_t size);
+	
+	template<class T>
+	bool initialize(const T* array, const size_t size);
+
 	bool initialize(const Vector& other);
-	void initialize(Vector&& other) noexcept;
-	bool initialize(const TYPE* begin, const TYPE* end); 
+	void initialize(Vector&& other);
 	bool initialize(std::initializer_list<TYPE> list);
+
+	template<class T1, class T2>
+	bool initialize(const T1* begin, const T2* end);
 	template<size_t sz>
-	bool initialize(const TYPE(&data)[sz]);
+	bool initialize(const TYPE(&array)[sz]);
 	template<size_t sz>
-	bool initialize(TYPE(&&data)[sz]);
+	bool initialize(TYPE(&&array)[sz]);
+
+
 	bool push_back(const TYPE& type);
 	bool push_back(TYPE&& type);
 	template<class ...Args>
 	bool emplace_back(Args&& ...args);
-
-
 	void clear();
 	bool resize(const size_t size);
 	bool reserve(const size_t size);
@@ -109,14 +114,14 @@ private:
 	bool> _resize(const size_t requested_size);
 
 
-	template<class U = TYPE>
-	enable_if_t<std::is_pod<U>::value == true> 
-	_fill(const TYPE* src, const size_t size, TYPE* dest);
+	template<class T, class U = TYPE>
+	enable_if_t<std::is_pod<U>::value == true>
+	_fill(const T* src, const size_t size, TYPE* dest);
 
 
-	template<class U = TYPE>
+	template<class T, class U = TYPE>
 	enable_if_t<std::is_pod<U>::value == true> 
-	_fill_move(TYPE* src, const size_t size, TYPE* dest);
+	_fill_move(T* src, const size_t size, TYPE* dest);
 	
 
 	// Non-Pod functions
@@ -137,15 +142,14 @@ private:
 	enable_if_t<std::is_pod<U>::value == false, 
 	bool> _resize(const size_t requested_size);
 
-	template<class U = TYPE>
+	template<class T, class U = TYPE>
 	enable_if_t<std::is_pod<U>::value == false> 
-	_fill(const TYPE* src, const size_t size, TYPE* dest);
+	_fill(const T* src, const size_t size, TYPE* dest);
 
 
-	template<class U = TYPE>
+	template<class T, class U = TYPE>
 	enable_if_t<std::is_pod<U>::value == false> 
-	_fill_move(TYPE* src, const size_t size, TYPE* dest);
-
+	_fill_move(T* src, const size_t size, TYPE* dest);
 
 	template<class U = TYPE>
 	enable_if_t<std::is_pod<U>::value == false,
@@ -277,7 +281,8 @@ inline bool Vector<TYPE>::initialize(const size_t vectorSize)
 
 
 template<class TYPE>
-bool Vector<TYPE>::initialize(const TYPE* array, const size_t arraySize)
+template<class T>
+bool Vector<TYPE>::initialize(const T* array, const size_t arraySize)
 {
 	if(this->initialize(arraySize))
 	{
@@ -310,14 +315,16 @@ bool Vector<TYPE>::initialize(const Vector& other)
 
 
 template<class TYPE>
-inline void Vector<TYPE>::initialize(Vector&& other) noexcept
+inline void Vector<TYPE>::initialize(Vector&& other)
 {
 	this->swap(other);
 }
 
 
+
 template<class TYPE>
-inline bool Vector<TYPE>::initialize(const TYPE* begin, const TYPE* end)
+template<class T1, class T2>
+inline bool Vector<TYPE>::initialize(const T1* begin, const T2* end)
 {
 	return this->initialize(begin, static_cast<size_t>(end - begin));
 }
@@ -593,9 +600,9 @@ bool> Vector<TYPE>::_resize(const size_t requested_size)
 
 
 template<class TYPE>
-template<class U>
+template<class T, class U>
 inline enable_if_t<std::is_pod<U>::value == true> 
-Vector<TYPE>::_fill(const TYPE* src, const size_t size, TYPE* dest)
+Vector<TYPE>::_fill(const T* src, const size_t size, TYPE* dest)
 {
 	const auto end = dest + size;
 	while(dest != end) 
@@ -609,9 +616,9 @@ Vector<TYPE>::_fill(const TYPE* src, const size_t size, TYPE* dest)
 
 
 template<class TYPE>
-template<class U>
+template<class T, class U>
 inline enable_if_t<std::is_pod<U>::value == true> 
-Vector<TYPE>::_fill_move(TYPE* src, const size_t size, TYPE* dest)
+Vector<TYPE>::_fill_move(T* src, const size_t size, TYPE* dest)
 {
 	// pod types don't care about moving
 	this->_fill(src, size, dest);
@@ -641,6 +648,7 @@ bool> Vector<TYPE>::_insert_back(Args&& ...args)
 }
 
 
+
 template<class TYPE>
 template<class U>
 inline enable_if_t<std::is_pod<U>::value == false> 
@@ -649,6 +657,8 @@ Vector<TYPE>::_clear()
 	_call_destructors(this->begin(), this->end());
 	_size = 0;
 }
+
+
 
 template<class TYPE>
 template<class U>
@@ -674,15 +684,15 @@ bool> Vector<TYPE>::_reserve(size_t requested_size)
 	}
 
 	// need copy _data to new memory block pointed by buff
-	try {
+	_UTIX_TRY_ (
 		this->_fill_move(_data, _size, buff);
-	}
-	catch(...) {
+	)
+	_UTIX_CATCH_(...,
 		// if exception is thrown, keeps the old _data
 		// and free buff
 		free_arr(buff);
 		throw;
-	}
+	)
 
 	// if success then erase the old _data
 	_call_destructors(this->begin(), this->end());
@@ -707,11 +717,20 @@ bool> Vector<TYPE>::_resize(const size_t requested_size)
 				return false;
 
 		// fill the new space
-		auto itr = _data + _size;
-		const auto end = _data + requested_size;
+		TYPE* itr = _data + _size;
+		const TYPE* end = _data + requested_size;
 
-		for( ; itr != end; ++itr)
-			new(itr) TYPE();
+		_UTIX_TRY_(
+			for( ; itr != end; ++itr)
+				new(itr) TYPE();
+		)
+
+		_UTIX_CATCH_(...,
+			// if exceptions is thrown
+			// preserve the ones who construct successful
+			_size = reinterpret_cast<size_t>(itr - _data);
+			throw;
+		)
 	}
 	else if ( _size > requested_size ) 
 	{
@@ -727,28 +746,27 @@ bool> Vector<TYPE>::_resize(const size_t requested_size)
 
 
 template<class TYPE>
-template<class U>
+template<class T, class U>
 inline enable_if_t<std::is_pod<U>::value == false> 
-Vector<TYPE>::_fill(const TYPE* src, const size_t size, TYPE* dest)
+Vector<TYPE>::_fill(const T* src, const size_t size, TYPE* dest)
 {
 	auto destItr = dest;
 	const auto destEnd = dest + size;
-	
-	try {
-	
+
+	_UTIX_TRY_(
 		while(destItr != destEnd) 
 		{
 			new(destItr) TYPE((*src));
 			++destItr;
 			++src;
 		}
-	}
-	catch(...) {
+	)
+	_UTIX_CATCH_(...,
 		// exception was thrown, destroy the data
 		// that has been copied.
 		_call_destructors(dest, destItr);
 		throw;
-	}
+	)
 }
 
 
@@ -762,27 +780,26 @@ Vector<TYPE>::_fill(const TYPE* src, const size_t size, TYPE* dest)
 
 
 template<class TYPE>
-template<class U>
+template<class T, class U>
 inline enable_if_t<std::is_pod<U>::value == false> 
-Vector<TYPE>::_fill_move(TYPE* src, const size_t size, TYPE* dest)
+Vector<TYPE>::_fill_move(T* src, const size_t size, TYPE* dest)
 {
 	auto destItr = dest;
 	const auto destEnd = dest + size;
-
-	try {
+	_UTIX_TRY_(
 		while(destItr != destEnd) 
 		{
 			new(destItr) TYPE(std::move_if_noexcept(*src));
 			++destItr;
 			++src;
 		}
-	}
-	catch(...) {
+	)
+	_UTIX_CATCH_(...,
 		// exception was thrown, destroy the data
 		// that has been copied.
 		_call_destructors(dest, destItr);
 		throw;
-	}
+	)
 }
 
 

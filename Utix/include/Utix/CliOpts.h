@@ -21,22 +21,20 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 #ifndef _UTIX_CLIOPTS_H_
 #define _UTIX_CLIOPTS_H_
 #include <string>
-#include <vector>
+#include <Utix/Vector.h>
 
 namespace utix {
 
 
 
-class CliOpts : public std::vector<std::string>
+class CliOpts : public Vector<std::string>
 {
-	using ArgVec = std::vector<std::string>;
 public:
 	CliOpts(int argc, char** argv);
-	CliOpts(std::vector<std::string>&& cliArgs);
+	CliOpts(Vector<std::string>&& cliArgs);
 	std::string GetOpt(const std::string& match) const;
-	bool RemoveOpt(const std::string& match);
 private:
-	ArgVec::const_iterator GetOptItr(const std::string& match) const;
+	const std::string* GetOptItr(const std::string& match) const;
 	mutable bool _isSub = false;
 };
 

@@ -19,7 +19,6 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 */
 
 #include <cstdlib>
-#include <new>
 #include <Utix/Alloc.h>
 #include <Utix/Assert.h>
 

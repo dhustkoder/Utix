@@ -33,14 +33,13 @@ namespace utix {
 
 
 CliOpts::CliOpts(int argc, char** argv)
-	: ArgVec(argv, argv + argc)
 {
-
+	Vector::initialize(argv, argv + argc);
 }
 
 
-CliOpts::CliOpts(std::vector<std::string>&& cliArgs)
-	: ArgVec(std::move(cliArgs))
+CliOpts::CliOpts(Vector<std::string>&& cliArgs)
+	: Vector(std::move(cliArgs))
 {
 
 }
@@ -68,7 +67,7 @@ std::string CliOpts::GetOpt(const std::string& match) const
 
 
 
-CliOpts::ArgVec::const_iterator CliOpts::GetOptItr(const std::string& match) const
+const std::string* CliOpts::GetOptItr(const std::string& match) const
 {
 	const auto matchSize = match.size();
 	const auto end = this->cend();
@@ -103,32 +102,6 @@ CliOpts::ArgVec::const_iterator CliOpts::GetOptItr(const std::string& match) con
 }
 
 
-
-
-
-
-bool CliOpts::RemoveOpt(const std::string& match)
-{
-	auto itr = GetOptItr(match);
-	const auto end = this->cend();
-
-	if (itr != end)
-	{
-		if (_isSub || *itr == match)
-		{
-			this->erase(itr);
-		}
-		else
-		{
-			itr = this->erase(itr);
-			this->erase(itr);
-		}
-
-		return true;
-	}
-
-	return false;
-}
 
 
 
