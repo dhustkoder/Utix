@@ -9,6 +9,6 @@ include_directories(${UTIX_INCLUDE_DIR})
 add_subdirectory(${UTIX_SRC_DIR})
 
 
-if( BUILD_TEST )
+if( BUILD_UTIX_TEST )
 	add_subdirectory(${UTIX_TEST_SRC_DIR})
 endif()
