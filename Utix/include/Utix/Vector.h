@@ -185,6 +185,7 @@ template<class TYPE>
 inline Vector<TYPE>& Vector<TYPE>::operator=(Vector&& other) noexcept
 {
 	this->swap(other);
+	return *this;
 }
 
 
@@ -498,7 +499,7 @@ inline bool Vector<TYPE>::check_capacity()
 	if( this->capacity() > _size )
 		return true;
 
-	return this->resize( _size * 2 );
+	return this->_reserve( _size * 2 );
 }
 
 

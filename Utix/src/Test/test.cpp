@@ -1,111 +1,51 @@
-
-
-
-#include <cstdio>
-#include <cstdlib>
-#include <iostream>
-#include <stdexcept>
+#include <string>
 #include <vector>
+#include <algorithm>
+
 #include <benchmark/benchmark.h>
-#include <Utix/Log.h>
 #include <Utix/Vector.h>
 
 
 
-#define MAX_LOOP 10
+std::vector<std::string> std_vec;
+utix::Vector<std::string> utix_vec;
 
 
-
-using namespace utix;
-
-
-struct NonPod
-{
-	NonPod() : id(s_i++) {}//{ Log("Constructor Of NonPod %d", id); }
-	NonPod(int x) : id(x) {}//{ Log("Int constructor called With Id: %d", id); }
-
-	NonPod(const NonPod& o) : id(o.id) {}//{ Log("Copy ctor"); }
-
-	NonPod(NonPod&& o) noexcept : id(o.id), buffer(o.buffer) { 
-		o.buffer = nullptr;
-		o.id=-o.id;
-		// Log("Move ctor of NonPods %d", id);
-	}
-
-	~NonPod() { 
-		//Log("Destructor Of NonPod %d", id);
-		std::free(buffer);
-	} 
+inline void PrepareVectors(benchmark::State& state) {
+	state.PauseTiming();	
+	benchmark::DoNotOptimize(std_vec);
+	benchmark::DoNotOptimize(utix_vec);
+	std_vec = std::vector<std::string>();
+	std_vec.reserve(state.range_x());
+	utix_vec.initialize(state.range_x());
+	state.ResumeTiming();
+}
 
 
-	NonPod& operator=(NonPod&& o) {
-		this->id = o.id;
-		this->buffer = o.buffer;
-		o.id = -o.id;
-		o.buffer = nullptr;
-		return *this;
-	}
-
-	NonPod& operator=(const NonPod& o) {
-		id = o.id;
-		return *this;
-	}
-
-
-
-	volatile int id;
-	volatile static int s_i;
-	int * buffer = nullptr;
-};
-
-volatile int NonPod::s_i = 1;
-
-
-
-struct Test {
-//	Test() : id(i++) { /*std::printf("I'm created: %d\r", id); */ }
-//	~Test() { /*std::printf("I'm destroyed: %d\r", id); */ }
-//	static int i;
-	int id;
-};
-
-//int Test::i = 0;
-
-static void utix_vector(benchmark::State& state) {
-
-	while(state.KeepRunning()) 
-	{
-		Vector<NonPod> v;
-		v.initialize();
-		v.resize( MAX_LOOP );
-		v.resize( MAX_LOOP / 2);
-		v.resize( 0 );	
-	}
-
+template<class C>
+inline void GenerateStrings(C& vec, const size_t size) {
+	for(size_t i = 0; i < size; ++i)
+		vec.emplace_back("");
 }
 
 
 
-static void std_vector(benchmark::State& state) 
-{
-	while(state.KeepRunning()) 
-	{
-		std::vector<NonPod> v;
-		v.resize( MAX_LOOP );
-		v.resize( MAX_LOOP / 2);
-		v.resize( 0 );
+void UTIX(benchmark::State& state) {
+	while(state.KeepRunning()) {
+		PrepareVectors(state);
+		GenerateStrings(utix_vec, state.range_x());
 	}
 }
 
-BENCHMARK(utix_vector);
-BENCHMARK(std_vector);
-BENCHMARK(utix_vector);
-BENCHMARK(std_vector);
+
+void STD(benchmark::State& state) {
+	while(state.KeepRunning()) {
+		PrepareVectors(state);
+		GenerateStrings(std_vec, state.range_x());
+	}
+}
 
 
+BENCHMARK(UTIX)->RangeMultiplier(2)->Range(8, 8<<10);
+BENCHMARK(STD)->RangeMultiplier(2)->Range(8, 8<<10);
 BENCHMARK_MAIN()
-
-
-
-
-
