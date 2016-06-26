@@ -442,11 +442,7 @@ inline bool Vector<TYPE>::reserve(const size_t size)
 template<class TYPE>
 inline bool Vector<TYPE>::resize(const size_t requested_size)
 {
-	if(requested_size != 0)
-		return _resize(requested_size);
-
-	this->_clear();
-	return true;
+	return _resize(requested_size);
 }
 
 
@@ -584,9 +580,9 @@ bool> Vector<TYPE>::_resize(const size_t requested_size)
 		if( requested_size > this->capacity() )
 			if(!this->reserve(requested_size))
 				return false;
-
-		_size = requested_size;
 	}
+	
+	_size = requested_size;
 
 	return true;
 }
@@ -703,21 +699,26 @@ template<class U>
 enable_if_t<std::is_pod<U>::value == false, 
 bool> Vector<TYPE>::_resize(const size_t requested_size)
 {
-	if(_size < requested_size)
+	if( _size < requested_size )
 	{
 		if( requested_size > this->capacity() )
 			if(!this->reserve(requested_size))
 				return false;
 
+		// fill the new space
 		auto itr = _data + _size;
 		const auto end = _data + requested_size;
 
 		for( ; itr != end; ++itr)
 			new(itr) TYPE();
-
-		_size = requested_size;
+	}
+	else if ( _size > requested_size ) 
+	{
+		this->_call_destructors(this->begin() + requested_size, this->end());
 	}
 
+
+	_size = requested_size;
 	return true;
 }
 

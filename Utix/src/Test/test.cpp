@@ -12,7 +12,7 @@
 
 
 
-#define MAX_LOOP 5000 * 100
+#define MAX_LOOP 10
 
 
 
@@ -61,16 +61,25 @@ struct NonPod
 volatile int NonPod::s_i = 1;
 
 
+
+struct Test {
+//	Test() : id(i++) { /*std::printf("I'm created: %d\r", id); */ }
+//	~Test() { /*std::printf("I'm destroyed: %d\r", id); */ }
+//	static int i;
+	int id;
+};
+
+//int Test::i = 0;
+
 static void utix_vector(benchmark::State& state) {
 
 	while(state.KeepRunning()) 
 	{
 		Vector<NonPod> v;
-		v.initialize(MAX_LOOP);
-		v.reserve(MAX_LOOP);
-	
-		for(size_t i = 0; i < MAX_LOOP; ++i)
-			v.push_back(NonPod(i));
+		v.initialize();
+		v.resize( MAX_LOOP );
+		v.resize( MAX_LOOP / 2);
+		v.resize( 0 );	
 	}
 
 }
@@ -79,44 +88,14 @@ static void utix_vector(benchmark::State& state) {
 
 static void std_vector(benchmark::State& state) 
 {
-
 	while(state.KeepRunning()) 
 	{
 		std::vector<NonPod> v;
-		v.reserve(MAX_LOOP);
-
-		for(size_t i = 0; i < MAX_LOOP; ++i)
-			v.push_back(NonPod(i));
+		v.resize( MAX_LOOP );
+		v.resize( MAX_LOOP / 2);
+		v.resize( 0 );
 	}
-
 }
-
-/*
-static void UVector_POD(benchmark::State &state) {
-
-	while(state.KeepRunning()) {
-		Vector<int> v;
-		v.initialize(MAX_LOOP);
-		v.resize(MAX_LOOP);
-		for(volatile size_t i = 0; i < MAX_LOOP; ++i)
-			v[i] = i;
-	}
-
-}
-
-
-
-static void StdVector_POD(benchmark::State &state) {
-
-	while(state.KeepRunning()) {
-		std::vector<int> v;
-		v.reserve(MAX_LOOP);
-		for(size_t i = 0; i < MAX_LOOP; ++i)
-			v.emplace_back(i);
-	}
-
-}
-*/
 
 BENCHMARK(utix_vector);
 BENCHMARK(std_vector);
