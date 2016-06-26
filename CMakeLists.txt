@@ -27,7 +27,7 @@ elseif(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
 
 # "Bench" better code generation but keep debug information
 elseif(${CMAKE_BUILD_TYPE} STREQUAL "Bench")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g  -DNDEBUG")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2  -DNDEBUG")
 endif()
 
 

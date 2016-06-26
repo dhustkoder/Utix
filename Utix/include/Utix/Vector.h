@@ -56,10 +56,10 @@ public:
 	const TYPE* begin() const;
 	const TYPE* end() const;
 	const TYPE* data() const;
-	const TYPE& operator[](size_t offset) const;
+	const TYPE& operator[](const size_t offset) const;
 
 
-	bool initialize(const size_t VectorSize = 1);
+	bool initialize(const size_t VectorSize = 0);
 	bool initialize(const TYPE* data, const size_t size);
 	bool initialize(const Vector& other);
 	void initialize(Vector&& other) noexcept;
@@ -82,19 +82,19 @@ public:
 	TYPE* begin();
 	TYPE* end();
 	TYPE* data();
-	TYPE& operator[](size_t offset);
+	TYPE& operator[](const size_t offset);
 
 	void swap(Vector& other) noexcept;
 	void free() noexcept;
 
 private:
 	bool reserve_init(size_t requested_size);
-
+	bool check_capacity();
 
 	// pod functions
 	template<class U = TYPE, class ...Args>
-	enable_if_t<std::is_pod<U>::value == true> 
-	_insert_back(Args&& ...args);
+	enable_if_t<std::is_pod<U>::value == true,
+	bool> _insert_back(Args&& ...args);
 
 	template<class U = TYPE>
 	enable_if_t<std::is_pod<U>::value == true> 
@@ -122,8 +122,8 @@ private:
 	// Non-Pod functions
 
 	template<class U = TYPE, class ...Args>
-	enable_if_t<std::is_pod<U>::value == false> 
-	_insert_back(Args&& ...args);
+	enable_if_t<std::is_pod<U>::value == false,
+	bool>_insert_back(Args&& ...args);
 
 	template<class U = TYPE>
 	enable_if_t<std::is_pod<U>::value == false> 
@@ -149,7 +149,7 @@ private:
 
 	template<class U = TYPE>
 	enable_if_t<std::is_pod<U>::value == false,
-	void> _call_destructors(TYPE* begin, TYPE* end) noexcept;
+	void> _call_destructors(TYPE* const begin, TYPE* end) noexcept;
 
 
 
@@ -253,7 +253,7 @@ inline const TYPE* Vector<TYPE>::data() const
 
 
 template<class TYPE>
-inline const TYPE& Vector<TYPE>::operator[](size_t offset) const
+inline const TYPE& Vector<TYPE>::operator[](const size_t offset) const
 {
 	ASSERT_MSG( _data != nullptr && offset < arr_size(_data), 
 		"offset overflow or not initialized Vector");
@@ -268,10 +268,7 @@ template<class TYPE>
 inline bool Vector<TYPE>::initialize(const size_t vectorSize)
 {
 	this->free();
-	if (this->reserve_init(vectorSize > 0 ? vectorSize : 4))
-		return true;
-
-	return false;
+	return reserve_init(vectorSize);
 }
 
 
@@ -386,7 +383,7 @@ inline TYPE* Vector<TYPE>::data()
 
 
 template<class TYPE>
-inline TYPE& Vector<TYPE>::operator[](size_t offset)
+inline TYPE& Vector<TYPE>::operator[]( const size_t offset )
 {
 	ASSERT_MSG( _data != nullptr && offset < arr_size(_data), 
 		"offset overflow or not initialized Vector");
@@ -401,37 +398,27 @@ inline TYPE& Vector<TYPE>::operator[](size_t offset)
 template<class TYPE>
 inline bool Vector<TYPE>::push_back(const TYPE& type)
 {
-	if( _size >= this->capacity() )
-		if(!this->_reserve())
-			return false;
-
-	this->_insert_back(type);
-	return true;
+	return this->_insert_back(type);
 }
+
+
 
 template<class TYPE>
 inline bool Vector<TYPE>::push_back(TYPE&& type)
 {
-	if( _size >= this->capacity() )
-		if(!this->_reserve())
-			return false;
-
-	this->_insert_back(std::move(type));
-	return true;
+	return this->_insert_back(std::move(type));
 }
+
+
 
 
 template<class TYPE>
 template<class ...Args>
 inline bool Vector<TYPE>::emplace_back(Args&& ...args)
 {
-	if( _size >= this->capacity() )
-		if(!this->_reserve())
-			return false;
-
-	this->_insert_back(std::forward<Args>(args)...);
-	return true;
+	return this->_insert_back(std::forward<Args>(args)...);
 }
+
 
 
 
@@ -455,7 +442,11 @@ inline bool Vector<TYPE>::reserve(const size_t size)
 template<class TYPE>
 inline bool Vector<TYPE>::resize(const size_t requested_size)
 {
-	return _resize(requested_size);
+	if(requested_size != 0)
+		return _resize(requested_size);
+
+	this->_clear();
+	return true;
 }
 
 
@@ -487,11 +478,10 @@ inline bool Vector<TYPE>::reserve_init(size_t requested_size)
 {
 	if( _data == nullptr )
 	{
-		if( requested_size == 0 ) {
+		if( requested_size == 0 )
 			requested_size = 10;
-		}
 
-		size_t bytes_to_allocate = sizeof(TYPE) * requested_size;
+		const size_t bytes_to_allocate = sizeof(TYPE) * requested_size;
 
 		if( (bytes_to_allocate / sizeof(TYPE)) < requested_size) {
 			LogError("Can't allocate %zu elements of TYPE with size %zu", requested_size, sizeof(TYPE));
@@ -506,8 +496,14 @@ inline bool Vector<TYPE>::reserve_init(size_t requested_size)
 	return true;
 }
 
+template<class TYPE>
+inline bool Vector<TYPE>::check_capacity()
+{
+	if( this->capacity() > _size )
+		return true;
 
-
+	return this->resize( _size * 2 );
+}
 
 
 
@@ -516,7 +512,7 @@ inline void Vector<TYPE>::free() noexcept
 {
 	if(_data)
 	{
-		this->_clear();
+		this->clear();
 		free_arr(_data);
 		_data = nullptr;
 	}
@@ -529,10 +525,15 @@ inline void Vector<TYPE>::free() noexcept
 
 template<class TYPE>
 template<class U, class ...Args>
-inline enable_if_t<std::is_pod<U>::value == true> 
-Vector<TYPE>::_insert_back(Args&& ...args)
+inline enable_if_t<std::is_pod<U>::value == true,
+bool> Vector<TYPE>::_insert_back(Args&& ...args)
 {
-	_data[_size++] = { std::forward<Args>(args)... };
+	if( check_capacity() ) {
+		_data[_size++] = TYPE(std::forward<Args>(args)...);
+		return true;
+	}
+
+	return false;
 }
 
 
@@ -553,21 +554,7 @@ bool> Vector<TYPE>::_reserve(size_t requested_size)
 {
 	ASSERT_MSG(_data != nullptr, "_reserve called before reserve_init");
 
-	// TODO: better check for extreme values
-	const auto currentCap = this->capacity();
-
-	if( requested_size == 0 ) {
-		requested_size = currentCap * 2; // grow by 2
-		if( requested_size < currentCap ) {
-			LogError("Can't grow Vector");
-			return false;
-		}
-	}
-	else if( currentCap >= requested_size ) {
-		return true;
-	}
-
-	size_t bytes_to_allocate = sizeof(TYPE) * requested_size;
+	const size_t bytes_to_allocate = sizeof(TYPE) * requested_size;
 
 	if( (bytes_to_allocate / sizeof(TYPE)) < requested_size) {
 		LogError("Can't allocate %zu elements of TYPE with size %zu", requested_size, sizeof(TYPE));
@@ -576,14 +563,14 @@ bool> Vector<TYPE>::_reserve(size_t requested_size)
 
 	TYPE* const buff = (TYPE*) realloc_arr(_data, bytes_to_allocate);
 
-	if(!buff)
+	if(buff)
 	{
-		LogError("Failed to reserve memory for Vector");
-		return false;
+		_data = buff;
+		return true;
 	}
-
-	_data = buff;
-	return true;
+	
+	LogError("Failed to reserve memory for Vector");
+	return false;
 }
 
 
@@ -594,14 +581,14 @@ bool> Vector<TYPE>::_resize(const size_t requested_size)
 {
 	if(_size < requested_size)
 	{
-		if( requested_size >= this->capacity() )
-			if(!this->_reserve(requested_size))
+		if( requested_size > this->capacity() )
+			if(!this->reserve(requested_size))
 				return false;
 
 		_size = requested_size;
 	}
 
-	return false;
+	return true;
 }
 
 
@@ -644,11 +631,16 @@ Vector<TYPE>::_fill_move(TYPE* src, const size_t size, TYPE* dest)
 
 template<class TYPE>
 template<class U, class ...Args>
-inline enable_if_t<std::is_pod<U>::value == false> 
-Vector<TYPE>::_insert_back(Args&& ...args)
+inline enable_if_t<std::is_pod<U>::value == false,
+bool> Vector<TYPE>::_insert_back(Args&& ...args)
 {
-	new(_data + _size) TYPE(std::forward<Args>(args)...);
-	++_size;
+	if( check_capacity() ) {
+		new(_data + _size) TYPE(std::forward<Args>(args)...);
+		++_size;
+		return true;
+	}
+
+	return false;
 }
 
 
@@ -667,29 +659,14 @@ enable_if_t<std::is_pod<U>::value == false,
 bool> Vector<TYPE>::_reserve(size_t requested_size)
 {
 	ASSERT_MSG(_data != nullptr, "_reserve called before reserve_init");
-	
-	const auto currentCap = this->capacity();
 
-	// if requested size is 0, grow current _capacity by 2
-	if( requested_size == 0 ) {
-		requested_size = currentCap * 2;
-		if( requested_size < currentCap ) {
-			LogError("Can't grow Vector");
-			return false;
-		}
-	}
-	else if( currentCap >= requested_size ) {
-		return true;
-	}
+	const size_t bytes_to_allocate = sizeof(TYPE) * requested_size;
 
-	size_t bytes_to_allocate = sizeof(TYPE) * requested_size;
-
-	if( (bytes_to_allocate / sizeof(TYPE)) < requested_size) 
+	if( (bytes_to_allocate / sizeof(TYPE)) < requested_size)
 	{
 		LogError("Can't allocate %zu elements of TYPE with size %zu", requested_size, sizeof(TYPE));
 		return false;
 	}
-
 
 	TYPE* const buff = (TYPE*) alloc_arr( bytes_to_allocate );
 
@@ -699,24 +676,20 @@ bool> Vector<TYPE>::_reserve(size_t requested_size)
 		return false;
 	}
 
-
-	if(_data) 
-	{
-		// need copy _data to new memory block pointed by buff
-		try {
-			this->_fill_move(buff, _size, _data);
-		}
-		catch(...) {
-			// if exception is thrown, keeps the old _data
-			// and free buff
-			free_arr(buff);
-			throw;
-		}
-
-		// if success then erase the old _data
-		_call_destructors(this->begin(), this->end());
-		free_arr(_data);
+	// need copy _data to new memory block pointed by buff
+	try {
+		this->_fill_move(_data, _size, buff);
 	}
+	catch(...) {
+		// if exception is thrown, keeps the old _data
+		// and free buff
+		free_arr(buff);
+		throw;
+	}
+
+	// if success then erase the old _data
+	_call_destructors(this->begin(), this->end());
+	free_arr(_data);
 
 	_data = buff;
 	return true;	
@@ -732,8 +705,8 @@ bool> Vector<TYPE>::_resize(const size_t requested_size)
 {
 	if(_size < requested_size)
 	{
-		if( requested_size >= this->capacity() )
-			if(!this->_reserve(requested_size))
+		if( requested_size > this->capacity() )
+			if(!this->reserve(requested_size))
 				return false;
 
 		auto itr = _data + _size;
@@ -745,7 +718,7 @@ bool> Vector<TYPE>::_resize(const size_t requested_size)
 		_size = requested_size;
 	}
 
-	return false;
+	return true;
 }
 
 
@@ -822,7 +795,7 @@ Vector<TYPE>::_fill_move(TYPE* src, const size_t size, TYPE* dest)
 template<class TYPE>
 template<class U>
 inline enable_if_t<std::is_pod<U>::value == false,
-void> Vector<TYPE>::_call_destructors(TYPE* begin, TYPE* end) noexcept
+void> Vector<TYPE>::_call_destructors(TYPE* const begin, TYPE* end) noexcept
 {
 	while(end != begin) 
 	{
