@@ -226,18 +226,20 @@ struct is_numeric :
 
 
 template<class T>
-inline constexpr size_t ToSizeT(T value) { return static_cast<size_t>(value); }
+constexpr size_t ToSizeT(T value) { return static_cast<size_t>(value); }
 
 
 
 // move and forward
 template<class T>
-inline constexpr 
-conditional_t<is_const<T>::value, T&, T&&>  move(T& t) { return static_cast<conditional_t<is_const<T>::value, T&, T&&>>(t); }
+constexpr remove_reference_t<T>&& move(T&& t) 
+{
+	using ReturnType = remove_reference_t<T>&&;
+	return static_cast<ReturnType>(t); 
+}
 
 template<class T>
-inline constexpr 
-T&& forward(remove_reference_t<T>& t) { return static_cast<T&&>(t); }
+constexpr T&& forward(remove_reference_t<T>& t) { return static_cast<T&&>(t); }
 
 
 
