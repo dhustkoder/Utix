@@ -18,8 +18,8 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 */
 
-#ifndef _UTIX_RWRAP_H_
-#define _UTIX_RWRAP_H_
+#ifndef UTIX_RWRAP_H_
+#define UTIX_RWRAP_H_
 
 #include "BaseTraits.h"
 
@@ -76,17 +76,17 @@ public:
 	~RWrap();
 
 
-	const T& data() const;
-	T& data();
+	const UT* data() const;
+	UT* data();
 
 	constexpr operator const T() const;
 	operator T();
 
+
+
 	template<class V>
 	const UT& operator[](const V val) const;
-	
 	const UT& operator*() const;
-
 	const UT* operator->() const;
 
 
@@ -96,7 +96,7 @@ public:
 	UT* operator->();
 
 
-	T& operator=(const T other);
+	UT*& operator=(const T other);
 
 private:
 	F _f;
@@ -107,27 +107,27 @@ private:
 
 
 template<class T, class F>
-inline constexpr 
+constexpr 
 RWrap<T, F>::RWrap(F&& f) 
-	: _f(forward<F>(f))
+	: _f(std::forward<F>(f))
 {
 	static_assert(noexcept(_f(_t)), "Destructor's functor must be noexcept");
 }
 
 template<class T, class F>
-inline constexpr 
+constexpr
 RWrap<T, F>::RWrap(T&& t, F&& f) 
-	: _f(forward<F>(f)),
-	_t(forward<T>(t))
+	: _f(std::forward<F>(f)),
+	_t(std::forward<T>(t))
 {
-	static_assert(noexcept(_f(_t)), "Destructor's functor must be noexcept");
+
 }
 
 
 template<class T, class F>
 inline RWrap<T, F>::RWrap(RWrap&& other)
-	: _f(move(other._f)),
-	_t(move(other._t))
+	: _f(std::move(other._f)),
+	_t(std::move(other._t))
 {
 	other._t = nullptr;
 }
@@ -136,22 +136,24 @@ inline RWrap<T, F>::RWrap(RWrap&& other)
 template<class T, class F>
 inline RWrap<T, F>::~RWrap()
 {
-	if(_t != nullptr)
+	if(_t != nullptr && _f != nullptr) {
 		_f(_t);
+		_t = nullptr;
+	}
 }
 
 
 template<class T, class F>
-inline T& RWrap<T, F>::data() { return _t; }
+inline typename RWrap<T, F>::UT* RWrap<T, F>::data() { return _t; }
 
 
 template<class T, class F>
-inline const T& RWrap<T, F>::data() const { return _t; }
+inline const typename RWrap<T, F>::UT* RWrap<T, F>::data() const { return _t; }
 
 
 
 template<class T, class F>
-inline constexpr RWrap<T, F>::operator const T() const { return _t; } 
+constexpr RWrap<T, F>::operator const T() const { return _t; } 
 
 
 template<class T, class F>
@@ -183,7 +185,7 @@ inline typename RWrap<T, F>::UT* RWrap<T, F>::operator->() { return _t;}
 
 
 template<class T, class F>
-inline T& RWrap<T, F>::operator=(const T other) 
+inline typename RWrap<T, F>::UT*& RWrap<T, F>::operator=(const T other) 
 { 
 	_f(&_t); 
 	_t = other; 
@@ -192,7 +194,7 @@ inline T& RWrap<T, F>::operator=(const T other)
 
 
 template<class T, class F>
-inline constexpr 
+constexpr 
 bool operator==(const RWrap<T, F>& lhs, 
                  const typename RWrap<T, F>::UT* const rhs) 
 { 
@@ -201,7 +203,7 @@ bool operator==(const RWrap<T, F>& lhs,
 
 
 template<class T, class F>
-inline constexpr 
+constexpr 
 bool operator==(const typename RWrap<T, F>::UT* const lhs, 
                  const RWrap<T, F>& rhs) 
 { 
@@ -211,7 +213,7 @@ bool operator==(const typename RWrap<T, F>::UT* const lhs,
 
 
 template<class T, class F>
-inline constexpr 
+constexpr 
 bool operator!=(const RWrap<T, F>& lhs, 
                  const typename RWrap<T, F>::UT* const rhs) 
 { 
@@ -220,7 +222,7 @@ bool operator!=(const RWrap<T, F>& lhs,
 
 
 template<class T, class F>
-inline constexpr 
+constexpr 
 bool operator!=(const typename RWrap<T, F>::UT* const lhs, 
                  const RWrap<T, F>& rhs) 
 { 
@@ -230,7 +232,7 @@ bool operator!=(const typename RWrap<T, F>::UT* const lhs,
 
 
 template<class T, class F>
-inline constexpr 
+constexpr 
 T operator+(const RWrap<T, F>& lhs, 
                  const typename RWrap<T, F>::UT* const rhs) 
 { 
@@ -239,7 +241,7 @@ T operator+(const RWrap<T, F>& lhs,
 
 
 template<class T, class F>
-inline constexpr 
+constexpr 
 T operator+(const typename RWrap<T, F>::UT* const lhs, 
                  const RWrap<T, F>& rhs) 
 { 
@@ -248,7 +250,7 @@ T operator+(const typename RWrap<T, F>::UT* const lhs,
 
 
 template<class T, class F>
-inline constexpr 
+constexpr 
 T operator-(const RWrap<T, F>& lhs, 
                  const typename RWrap<T, F>::UT* const rhs) 
 { 
@@ -257,7 +259,7 @@ T operator-(const RWrap<T, F>& lhs,
 
 
 template<class T, class F>
-inline constexpr 
+constexpr 
 T operator-(const typename RWrap<T, F>::UT* const lhs, 
                  const RWrap<T, F>& rhs) 
 { 
@@ -274,9 +276,9 @@ T operator-(const typename RWrap<T, F>::UT* const lhs,
 
 
 template<class T, class F>
-inline constexpr RWrap<T, F> make_rwrap(T&& t, F&& f) { return RWrap<T, F>(forward<T>(t), forward<F>(f)); }
+inline RWrap<T, F> make_rwrap(T&& t, F&& f) { return RWrap<T, F>(std::forward<T>(t), std::forward<F>(f)); }
 template<class T, class F>
-inline constexpr RWrap<T, F> make_rwrap(F&& f) { return RWrap<T, F>(forward<F>(f)); }
+inline RWrap<T, F> make_rwrap(F&& f) { return RWrap<T, F>(std::forward<F>(f)); }
 
 
 
@@ -286,4 +288,4 @@ inline constexpr RWrap<T, F> make_rwrap(F&& f) { return RWrap<T, F>(forward<F>(f
 
 }
 
-#endif
+#endif // UTIX_RWRAP_H_
