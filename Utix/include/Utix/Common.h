@@ -31,22 +31,18 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 namespace utix {
 
 template<class T>
-inline enable_if_t<is_numeric<T>::value> Clamp(const T min, const T max, T* const lval)
+constexpr enable_if_t<is_numeric<T>::value, T> Clamp(const T val, const T min, const T max)
 {
-	if(*lval > max)
-		*lval = max;
-	else if(*lval < min)
-		*lval = min;
+	return ( val > max ) ? max : 
+		( val < min ) ? min : val;
 }
 
 
 template<class T>
-inline enable_if_t<!is_numeric<T>::value> Clamp(const T& min, const T& max, T* const lval)
+constexpr enable_if_t<!is_numeric<T>::value, T&> Clamp(const T& val, const T& min, const T& max)
 {
-	if(*lval > max)
-		*lval = max;
-	else if(*lval < min)
-		*lval = min;
+	return ( val > max ) ? max : 
+		( val < min ) ? min : val;
 }
 
 
@@ -60,9 +56,9 @@ inline void Sleep(const Nano& nano)
 	static timespec _sleep{ 0, 0 };
 	_sleep.tv_nsec = nano.count();
 	if(nanosleep(&_sleep, NULL)==-1)
-          LogError("nanosleep error");
+		LogError("nanosleep error");
      
-#elif _WIN32 
+#elif defined(_WIN32)
 	using namespace std::chrono;
 	::Sleep(static_cast<DWORD>(duration_cast<Milli>(nano).count()));
 #endif
