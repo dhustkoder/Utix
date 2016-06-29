@@ -116,15 +116,17 @@ std::string GetFullProcName()
 std::string GetFullProcDir()
 {
 #ifdef _WIN32
-     constexpr const char dirSlash = '\\';
+	constexpr const char dirSlash = '\\';
 #elif defined(__linux__) || defined(__APPLE__)
-     constexpr const char dirSlash = '/';
+	constexpr const char dirSlash = '/';
 #endif
 
-     auto fullPath = GetFullProcName();
-     fullPath.erase(fullPath.find_last_of(dirSlash), fullPath.size());
-     
-     return fullPath;
+	auto fullPath = GetFullProcName();
+
+	if( !fullPath.empty() )
+		fullPath.erase(fullPath.find_last_of(dirSlash) + 1, fullPath.size());
+
+	return fullPath;
 }
 
 

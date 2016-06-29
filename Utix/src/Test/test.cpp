@@ -14,4 +14,10 @@ using namespace utix;
 
 int main(int argc, char** argv)
 {
+
+
+	std::cout << GetFullProcDir() << '\n';
+
+
+
 }
