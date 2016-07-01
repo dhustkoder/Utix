@@ -3,6 +3,7 @@ project(Utix)
 
 option(ADDRESS_SANITIZER OFF)
 option(MEMORY_SANITIZER OFF)
+option(ENABLE_LTO OFF)
 
 # compiler settings flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -std=c++11 -pedantic")
@@ -38,6 +39,13 @@ endif()
 if( UNDEFINED_SANITIZER )
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=undefined")
 endif()
+
+
+if( ENABLE_LTO )
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -flto")
+endif()
+
+
 
 
 add_subdirectory(Utix)
