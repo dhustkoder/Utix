@@ -76,7 +76,7 @@ public:
 	~RWrap();
 
 
-	const UT* data() const;
+	constexpr const UT* data() const;
 	UT* data();
 
 	constexpr operator const T() const;
@@ -85,9 +85,9 @@ public:
 
 
 	template<class V>
-	const UT& operator[](const V val) const;
-	const UT& operator*() const;
-	const UT* operator->() const;
+	constexpr const UT& operator[](const V val) const;
+	constexpr const UT& operator*() const;
+	constexpr const UT* operator->() const;
 
 
 	template<class V>
@@ -120,7 +120,7 @@ RWrap<T, F>::RWrap(T&& t, F&& f)
 	: _f(std::forward<F>(f)),
 	_t(std::forward<T>(t))
 {
-
+	static_assert(noexcept(_f(_t)), "Destructor's functor must be noexcept");
 }
 
 
@@ -148,7 +148,7 @@ inline typename RWrap<T, F>::UT* RWrap<T, F>::data() { return _t; }
 
 
 template<class T, class F>
-inline const typename RWrap<T, F>::UT* RWrap<T, F>::data() const { return _t; }
+constexpr const typename RWrap<T, F>::UT* RWrap<T, F>::data() const { return _t; }
 
 
 
@@ -162,15 +162,15 @@ inline RWrap<T, F>::operator T() { return _t; }
 
 template<class T, class F>
 template<class V>
-inline const typename RWrap<T, F>::UT& RWrap<T, F>::operator[](const V val) const { return _t[val];}
+constexpr const typename RWrap<T, F>::UT& RWrap<T, F>::operator[](const V val) const { return _t[val];}
 
 
 template<class T, class F>
-inline const typename RWrap<T, F>::UT& RWrap<T, F>::operator*() const { return *_t; }
+constexpr const typename RWrap<T, F>::UT& RWrap<T, F>::operator*() const { return *_t; }
 
 
 template<class T, class F>
-inline const typename RWrap<T, F>::UT* RWrap<T, F>::operator->() const { return _t; }
+constexpr const typename RWrap<T, F>::UT* RWrap<T, F>::operator->() const { return _t; }
 
 template<class T, class F>
 template<class V>
@@ -275,11 +275,13 @@ T operator-(const typename RWrap<T, F>::UT* const lhs,
 
 
 
-template<class T, class F>
-inline RWrap<T, F> make_rwrap(T&& t, F&& f) { return RWrap<T, F>(std::forward<T>(t), std::forward<F>(f)); }
-template<class T, class F>
-inline RWrap<T, F> make_rwrap(F&& f) { return RWrap<T, F>(std::forward<F>(f)); }
-
+template<class ResourcePtr, class CleanupFunc>
+constexpr RWrap<ResourcePtr, CleanupFunc> 
+make_rwrap(ResourcePtr&& rptr, CleanupFunc&& fun) 
+{
+	return RWrap<ResourcePtr, CleanupFunc>(std::forward<ResourcePtr>(rptr),
+                                           std::forward<CleanupFunc>(fun));
+}
 
 
 

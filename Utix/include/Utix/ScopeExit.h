@@ -42,9 +42,9 @@ private:
 };
 
 
-template<class T>
-constexpr inline ScopeExit<T> make_scope_exit(T&& t) noexcept {
-	return ScopeExit<T>(forward<T>(t));
+template<class Callable>
+constexpr ScopeExit<Callable> make_scope_exit(Callable&& c) {
+	return ScopeExit<Callable>(forward<Callable>(c));
 }
 
 

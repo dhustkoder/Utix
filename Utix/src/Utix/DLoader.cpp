@@ -69,8 +69,9 @@ bool DLoader::Load(const std::string& dlPath)
 		if (!newHandle)
 		{
 			const char* error = dlerror();
-			LogError("Could not load shared library: %s or %s\nError: %s", 
-                                  dlPath.c_str(), dlPathFix.c_str(), error);
+			LogError("Could not load shared library: %s or %s\n", 
+                                  dlPath.c_str(), dlPathFix.c_str());
+			LogError("Error: %s\n", error);
 
 			return false;
 		}
