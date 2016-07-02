@@ -43,7 +43,7 @@ private:
 
 
 template<class Callable>
-constexpr ScopeExit<Callable> make_scope_exit(Callable&& c) {
+constexpr ScopeExit<Callable> MakeScopeExit(Callable&& c) {
 	return ScopeExit<Callable>(forward<Callable>(c));
 }
 

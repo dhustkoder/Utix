@@ -58,7 +58,7 @@ bool Process::Run(const std::string &app)
 	if (_pid != 0)
 		Terminate();
 
-	const auto clean = make_scope_exit([this]() noexcept 
+	const auto clean = MakeScopeExit([this]() noexcept 
 	{ 
 		if(_pid == -1) 
 			_pid = 0;		
@@ -114,7 +114,7 @@ int Process::Join()
 {
 	int status;
 	
-	const auto clean = make_scope_exit([this]() noexcept { this->_pid = 0; });
+	const auto clean = MakeScopeExit([this]() noexcept { this->_pid = 0; });
 
 	waitpid(_pid, &status, 0);
 	
@@ -211,7 +211,7 @@ bool Process::Run(const std::string &app)
 int Process::Join()
 {
 
-	const auto clean = make_scope_exit([this]() noexcept { CloseAndZero(); });
+	const auto clean = MakeScopeExit([this]() noexcept { CloseAndZero(); });
 
 	DWORD exitCode;
 
