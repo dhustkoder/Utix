@@ -1,23 +1,20 @@
 #include <iostream>
-#include <string>
-#include <vector>
-#include <algorithm>
-#include <Utix/Vector.h>
-#include <Utix/CliOpts.h>
-#include <Utix/Common.h>
-
-
+#include <Utix/NotNull.h>
 using namespace utix;
+
+class Bug {
+public:
+	Bug() {}
+	~Bug() {}
+	void CallBug() { std::cout << "You're the shit!\n"; }
+};
 
 
 
 
 int main(int argc, char** argv)
 {
+	NotNull<Bug*> bug(new(std::nothrow) Bug());
 
-
-	std::cout << GetFullProcDir() << '\n';
-
-
-
+	(*bug).CallBug();
 }
