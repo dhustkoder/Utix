@@ -18,8 +18,8 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 */
 
-#ifndef _UTIX_STDINT_H_
-#define _UTIX_STDINT_H_
+#ifndef UTIX_STDINT_H_
+#define UTIX_STDINT_H_
 
 #include <cstdint>
 #include <cstddef>
@@ -63,4 +63,4 @@ using std::nullptr_t;
 
 
 
-#endif
+#endif // UTIX_STDINT_H_

@@ -18,8 +18,8 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 */
 
-#ifndef _UTIX_UTILS_COLOR_H_
-#define _UTIX_UTILS_COLOR_H_
+#ifndef UTIX_COLOR_H_
+#define UTIX_COLOR_H_
 #include <iostream>
 #include "Ints.h"
 
@@ -70,4 +70,4 @@ inline std::ostream& operator<<(std::ostream& os, const Color& color)
 
 
 
-#endif
+#endif // UTIX_COLOR_H_

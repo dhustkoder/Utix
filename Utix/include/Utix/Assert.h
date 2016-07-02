@@ -18,8 +18,8 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 */
 
-#ifndef _UTIX_ASSERT_H_
-#define _UTIX_ASSERT_H_
+#ifndef UTIX_ASSERT_H_
+#define UTIX_ASSERT_H_
 
 
 #ifndef _DEBUG
@@ -67,4 +67,7 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 
 #endif
-#endif
+
+
+
+#endif // UTIX_ASSERT_H_

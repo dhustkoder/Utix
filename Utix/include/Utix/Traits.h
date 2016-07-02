@@ -18,8 +18,8 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 */
 
-#ifndef _UTIX_TRAITS_H_
-#define _UTIX_TRAITS_H_
+#ifndef UTIX_TRAITS_H_
+#define UTIX_TRAITS_H_
 #include <type_traits>
 #include "BaseTraits.h"
 
@@ -39,4 +39,4 @@ constexpr underlying_type_t<T> toUtype(T t) noexcept
 
 
 
-#endif
+#endif // UTIX_TRAITS_H_

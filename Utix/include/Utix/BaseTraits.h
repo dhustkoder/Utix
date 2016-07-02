@@ -18,8 +18,8 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 */
 
-#ifndef _UTIX_BASETRAITS_H_
-#define _UTIX_BASETRAITS_H_
+#ifndef UTIX_BASETRAITS_H_
+#define UTIX_BASETRAITS_H_
 #include "Ints.h"
 
 namespace utix {
@@ -256,4 +256,4 @@ constexpr T&& forward(remove_reference_t<T>& t) { return static_cast<T&&>(t); }
 }
 
 
-#endif
+#endif // UTIX_BASETRAITS_H_

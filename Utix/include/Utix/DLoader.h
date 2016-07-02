@@ -22,8 +22,8 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 
 
-#ifndef _UTIX_DLOADER_H_
-#define _UTIX_DLOADER_H_
+#ifndef UTIX_DLOADER_H_
+#define UTIX_DLOADER_H_
 
 #if defined(__linux__) || defined(__APPLE__)
 #include <dlfcn.h>
@@ -68,5 +68,5 @@ private:
 }
 
 
-#endif
+#endif // UTIX_DLOADER_H_
 

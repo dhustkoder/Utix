@@ -19,8 +19,8 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 */
 
 
-#ifndef _UTIX_ALLOC_H_
-#define _UTIX_ALLOC_H_
+#ifndef UTIX_ALLOC_H_
+#define UTIX_ALLOC_H_
 #include <cstring>
 #include "Ints.h"
 #include "BaseTraits.h"
@@ -113,4 +113,8 @@ inline void arr_zero(void* arr, const size_t size)
 
 
 }
-#endif
+
+
+
+
+#endif // UTIX_ALLOC_H_

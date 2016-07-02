@@ -18,8 +18,8 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 */
 
-#ifndef _UTIX_CLIOPTS_H_
-#define _UTIX_CLIOPTS_H_
+#ifndef UTIX_CLIOPTS_H_
+#define UTIX_CLIOPTS_H_
 #include <string>
 #include <Utix/Vector.h>
 
@@ -49,4 +49,4 @@ private:
 
 
 
-#endif
+#endif // UTIX_CLIOPTS_H_

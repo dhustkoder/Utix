@@ -18,8 +18,8 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 */
 
-#ifndef _UTIX_VECTOR2_H_
-#define _UTIX_VECTOR2_H_
+#ifndef UTIX_VECTOR2_H_
+#define UTIX_VECTOR2_H_
 #include <iostream>
 
 
@@ -248,4 +248,4 @@ inline std::ostream& operator<<(std::ostream& os, const Vector2<T>& v)
 
 
 
-#endif
+#endif // UTIX_VECTOR2_H_

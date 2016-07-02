@@ -18,8 +18,8 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 */
 
-#ifndef _UTIX_SCOPE_EXIT_H_
-#define _UTIX_SCOPE_EXIT_H_
+#ifndef UTIX_SCOPE_EXIT_H_
+#define UTIX_SCOPE_EXIT_H_
 #include "BaseTraits.h"
 
 namespace utix {
@@ -62,4 +62,4 @@ constexpr ScopeExit<Callable> MakeScopeExit(Callable&& c) {
 
 
 
-#endif
+#endif // UTIX_SCOPE_EXIT_H_

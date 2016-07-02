@@ -21,8 +21,8 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 
 
-#ifndef _UTIX_COMMON_H_
-#define _UTIX_COMMON_H_
+#ifndef UTIX_COMMON_H_
+#define UTIX_COMMON_H_
 #include <string>
 #include "BaseTraits.h"
 #include "Timer.h"
@@ -118,4 +118,4 @@ std::string GetFullProcDir();
 
 
 
-#endif
+#endif // UTIX_COMMON_H_

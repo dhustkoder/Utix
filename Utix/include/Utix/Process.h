@@ -18,8 +18,8 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 */
 
-#ifndef _UTIX_PROCESS_H_
-#define _UTIX_PROCESS_H_
+#ifndef UTIX_PROCESS_H_
+#define UTIX_PROCESS_H_
 
 #if defined(__APPLE__) || defined(__linux__)
 #include <signal.h>
@@ -104,4 +104,4 @@ private:
 
 
 
-#endif
+#endif // UTIX_PROCESS_H_

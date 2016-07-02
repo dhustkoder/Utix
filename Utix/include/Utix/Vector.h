@@ -21,8 +21,8 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 
 
-#ifndef _UTIX_VECTOR_H_
-#define _UTIX_VECTOR_H_
+#ifndef UTIX_VECTOR_H_
+#define UTIX_VECTOR_H_
 
 #include <initializer_list>
 #include "Traits.h"
@@ -832,4 +832,4 @@ void> Vector<TYPE>::_call_destructors(TYPE* const begin, TYPE* end) noexcept
 }
 
 
-#endif
+#endif // UTIX_VECTOR_H_

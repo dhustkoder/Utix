@@ -18,8 +18,8 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 */
 
-#ifndef _UTIX_MEMORY_H_
-#define _UTIX_MEMORY_H_
+#ifndef UTIX_MEMORY_H_
+#define UTIX_MEMORY_H_
 
 #include <memory>
 #include "Traits.h"
@@ -56,4 +56,4 @@ enable_if_t<std::extent<T>::value != 0,
 }
 
 
-#endif
+#endif // UTIX_MEMORY_H_

@@ -18,8 +18,8 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 */
 
-#ifndef _UTIX_TIMER_H_
-#define _UTIX_TIMER_H_
+#ifndef UTIX_TIMER_H_
+#define UTIX_TIMER_H_
 #include <chrono>
 
 #if defined(__linux__) || defined(__APPLE__)
@@ -130,4 +130,4 @@ inline enable_if_t<is_numeric<T>::value> Timer::SetTargetHz(const T val) { this-
 }
 
 
-#endif
+#endif // UTIX_TIMER_H_
