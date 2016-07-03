@@ -56,6 +56,9 @@
     <ClInclude Include="..\..\Utix\include\Utix\Process.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Utix\include\Utix\NotNull.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Utix\include\Utix\Memory.h">
       <Filter>Header Files</Filter>
     </ClInclude>

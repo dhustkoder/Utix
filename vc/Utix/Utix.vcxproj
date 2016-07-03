@@ -155,6 +155,7 @@
     <ClInclude Include="..\..\Utix\include\Utix\Ints.h" />
     <ClInclude Include="..\..\Utix\include\Utix\Log.h" />
     <ClInclude Include="..\..\Utix\include\Utix\Memory.h" />
+    <ClInclude Include="..\..\Utix\include\Utix\NotNull.h" />
     <ClInclude Include="..\..\Utix\include\Utix\Process.h" />
     <ClInclude Include="..\..\Utix\include\Utix\RWrap.h" />
     <ClInclude Include="..\..\Utix\include\Utix\ScopeExit.h" />
