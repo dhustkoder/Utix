@@ -27,5 +27,9 @@ int main()
 	LOG("b2", b2.Get());
 	LOG("b1", b1.Get());
 	delete b1;
+
+	remove_pointer_t<int* restrict> x = 10;
+	std::cout << "X: " << x << '\n';
+
 	
 }

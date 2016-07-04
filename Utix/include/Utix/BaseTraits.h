@@ -21,15 +21,16 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 #ifndef UTIX_BASETRAITS_H_
 #define UTIX_BASETRAITS_H_
 #include "Ints.h"
+#include "Restrict.h"
 
 namespace utix {
 
 #if __EXCEPTIONS
-     #define _UTIX_TRY_(try_code) try { try_code }
-     #define _UTIX_CATCH_(exception, handle_code) catch(exception) { handle_code }
+     #define UTIX_TRY_(try_code) try { try_code }
+     #define UTIX_CATCH_(exception, handle_code) catch(exception) { handle_code }
 #else
-     #define _UTIX_TRY_(try_code) try_code
-     #define _UTIX_CATCH_(exception, handle_code)
+     #define UTIX_TRY_(try_code) try_code
+     #define UTIX_CATCH_(exception, handle_code)
 #endif
 
 
@@ -77,7 +78,8 @@ template<class T>
 struct is_pointer : false_type {};
 template<class T>
 struct is_pointer<T*> : true_type {};
-
+template<class T>
+struct is_pointer<T* restrict> : true_type {};
 // C++14 variable template
 //template<class T>
 //constexpr bool is_pointer_v = is_pointer<T>::value;
@@ -90,20 +92,46 @@ template<class T>
 struct is_reference<T&> : true_type {};
 template<class T>
 struct is_reference<T&&> : true_type {};
-
+template<class T>
+struct is_reference<T& restrict> : true_type {};
+template<class T>
+struct is_reference<T&& restrict> : true_type {};
 // C++14 variable template
 //template<class T>
 //constexpr bool is_reference_v = is_reference<T>::value;
 
+
+
+// remove qualifiers:
 
 // remove pointer
 template<class T>
 struct remove_pointer : type_is<T> {} ;
 template<class T>
 struct remove_pointer<T*> : remove_pointer<T> {};
+template<class T>
+struct remove_pointer<T* restrict> : remove_pointer<T> {};
 
 template<class T>
 using remove_pointer_t = typename remove_pointer<T>::type;
+
+
+//remove reference
+template<class T>
+struct remove_reference : type_is<T> {};
+template<class T>
+struct remove_reference<T&> : remove_reference<T> {};
+template<class T>
+struct remove_reference<T&&> : remove_reference<T> {};
+template<class T>
+struct remove_reference<T& restrict> : remove_reference<T> {};
+template<class T>
+struct remove_reference<T&& restrict> : remove_reference<T> {};
+
+template<class T>
+using remove_reference_t = typename remove_reference<T>::type;
+
+
 
 
 // remove const
@@ -123,17 +151,6 @@ struct remove_volatile<volatile T> : remove_volatile<T> {};
 template<class T>
 using remove_volatile_t = typename remove_volatile<T>::type;
 
-
-//remove reference
-template<class T>
-struct remove_reference : type_is<T> {};
-template<class T>
-struct remove_reference<T&> : remove_reference<T> {};
-template<class T>
-struct remove_reference<T&&> : remove_reference<T> {};
-
-template<class T>
-using remove_reference_t = typename remove_reference<T>::type;
 
 
 

@@ -684,10 +684,10 @@ bool> Vector<TYPE>::_reserve(size_t requested_size)
 	}
 
 	// need copy _data to new memory block pointed by buff
-	_UTIX_TRY_ (
+	UTIX_TRY_ (
 		this->_fill_move(_data, _size, buff);
 	)
-	_UTIX_CATCH_(...,
+	UTIX_CATCH_(...,
 		// if exception is thrown, keeps the old _data
 		// and free buff
 		free_arr(buff);
@@ -720,12 +720,12 @@ bool> Vector<TYPE>::_resize(const size_t requested_size)
 		TYPE* itr = _data + _size;
 		const TYPE* end = _data + requested_size;
 
-		_UTIX_TRY_(
+		UTIX_TRY_(
 			for( ; itr != end; ++itr)
 				new(itr) TYPE();
 		)
 
-		_UTIX_CATCH_(...,
+		UTIX_CATCH_(...,
 			// if exceptions is thrown
 			// preserve the ones who construct successful
 			_size = reinterpret_cast<size_t>(itr - _data);
@@ -753,7 +753,7 @@ Vector<TYPE>::_fill(const T* src, const size_t size, TYPE* dest)
 	auto destItr = dest;
 	const auto destEnd = dest + size;
 
-	_UTIX_TRY_(
+	UTIX_TRY_(
 		while(destItr != destEnd) 
 		{
 			new(destItr) TYPE((*src));
@@ -761,7 +761,7 @@ Vector<TYPE>::_fill(const T* src, const size_t size, TYPE* dest)
 			++src;
 		}
 	)
-	_UTIX_CATCH_(...,
+	UTIX_CATCH_(...,
 		// exception was thrown, destroy the data
 		// that has been copied.
 		_call_destructors(dest, destItr);
@@ -786,7 +786,7 @@ Vector<TYPE>::_fill_move(T* src, const size_t size, TYPE* dest)
 {
 	auto destItr = dest;
 	const auto destEnd = dest + size;
-	_UTIX_TRY_(
+	UTIX_TRY_(
 		while(destItr != destEnd) 
 		{
 			new(destItr) TYPE(std::move_if_noexcept(*src));
@@ -794,7 +794,7 @@ Vector<TYPE>::_fill_move(T* src, const size_t size, TYPE* dest)
 			++src;
 		}
 	)
-	_UTIX_CATCH_(...,
+	UTIX_CATCH_(...,
 		// exception was thrown, destroy the data
 		// that has been copied.
 		_call_destructors(dest, destItr);
