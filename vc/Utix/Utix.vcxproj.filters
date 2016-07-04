@@ -89,5 +89,8 @@
     <ClInclude Include="..\..\Utix\include\Utix\Alloc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Utix\include\Utix\Restrict.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

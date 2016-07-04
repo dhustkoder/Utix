@@ -15,7 +15,7 @@ public:
 
 
 
-#define LOG(x, y) std::printf("%s: %zX\n",x, reinterpret_cast<size_t>(y));
+#define LOG(x, y) std::printf("%s: %zX\n",x, reinterpret_cast<uintptr_t>(y));
 int main()
 {
 	NotNull<Bug*> b1( new Bug() );
