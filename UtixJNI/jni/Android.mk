@@ -1,10 +1,10 @@
-LOCAL_PATH := $(call my-dir)
+UTIX_JNI_PATH := $(call my-dir)
 
 
 include $(CLEAR_VARS)
 
-UTIX_SRC_DIR :=${LOCAL_PATH}/../../Utix/src/Utix/
-UTIX_INCLUDE_DIR :=${LOCAL_PATH}/../../Utix/include/
+UTIX_SRC_DIR :=${UTIX_JNI_PATH}/../../Utix/src/Utix/
+UTIX_INCLUDE_DIR :=${UTIX_JNI_PATH}/../../Utix/include/
 
 
 LOCAL_MODULE := Utix
