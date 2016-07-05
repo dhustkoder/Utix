@@ -18,10 +18,16 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 */
 
-#include <cerrno>
-#include <cstdio>
-#include <cstdarg>
-#include <cstring>
+
+#include <errno.h>
+#include <stdio.h>
+#include <stdarg.h>
+#include <string.h>
+
+#ifdef __ANDROID__
+#include <android/log.h>
+#endif
+
 #include <Utix/Log.h>
 
 
@@ -35,15 +41,19 @@ namespace utix {
 
 static std::string errstr(512, '\0');
 
+
 void Log(const char* fmtString, ...) noexcept
 {
 	va_list args;
 	va_start(args, fmtString);
-
-	if(std::vfprintf(stdout, fmtString, args) < 0 )
+	
+	#ifdef __ANDROID__
+	__android_log_vprint(ANDROID_LOG_VERBOSE, "LOG", fmtString, args);
+	#else
+	if(vfprintf(stdout, fmtString, args) < 0 )
 		LogError("Failed to print Log");
-
-	std::fprintf(stdout, "\n");
+	fprintf(stdout, "\n");
+	#endif
 	va_end(args);
 }
 
@@ -53,31 +63,37 @@ void LogError(const char* fmtString, ...) noexcept
 	const auto errnoCode = errno;
 	va_list args;
 	va_start(args, fmtString);
-	
+
 	// write the message to buffer and get writeSize
 	const auto errstrSize = errstr.size();
-	const auto writeSize = std::vsnprintf(&errstr[0], errstrSize, fmtString, args);
+	const auto writeSize = vsnprintf(&errstr[0], errstrSize, fmtString, args);
+	
+	va_end(args);
 
 	if(writeSize > 0)
 	{
 		if(errnoCode) { 
-			std::snprintf(&errstr[writeSize], errstrSize - writeSize, ": %s", strerror(errnoCode));
+			snprintf(&errstr[writeSize], errstrSize - writeSize, ": %s", strerror(errnoCode));
 			errno = 0;
 		}
 		else { 
 			errstr[writeSize] = '\0';
 		}
-		// print
-		std::fprintf(stderr, "%s\n", errstr.c_str());
+		
+		// print to stderr
+		#ifdef __ANDROID__
+		__android_log_print(ANDROID_LOG_ERROR, "LOG ERROR", "%s", errstr.c_str());
+		#else
+		fprintf(stderr, "%s\n", errstr.c_str());
+		#endif
 	}
 	else
 	{
 		perror("Error in LogError vsprintf!!:");
 	}
 
-
-	va_end(args);
 }
+
 
 const std::string& GetLastLogError() noexcept
 {

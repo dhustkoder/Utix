@@ -18,7 +18,7 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 */
 
-#include <cstdlib>
+#include <stdlib.h>
 #include <Utix/Alloc.h>
 #include <Utix/Assert.h>
 
@@ -31,7 +31,7 @@ void* alloc_arr(const size_t size) noexcept
 {
 	ASSERT_MSG(size > 0, "attempt to alloc array of size 0");
 
-	auto* const block = (size_t*) std::malloc(size + sizeof(size_t));
+	auto* const block = (size_t*) malloc(size + sizeof(size_t));
 	
 	if (block)
 	{
@@ -49,7 +49,7 @@ void* realloc_arr(void* from, const size_t size) noexcept
 	ASSERT_MSG(from != nullptr, "attempt to realloc from null pointer!");
 	ASSERT_MSG(size > 0, "attempt to realloc to size 0!");
 
-	auto* const block = (size_t*) std::realloc(((size_t*)from-1), size + sizeof(size_t));
+	auto* const block = (size_t*) realloc(((size_t*)from-1), size + sizeof(size_t));
 
 	if(block)
 	{

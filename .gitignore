@@ -14,6 +14,7 @@ push_master.sh
 *.lo
 *.o
 *.obj
+*.d
 
 # Precompiled Headers
 *.gch
