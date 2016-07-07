@@ -48,7 +48,7 @@ void Log(const char* fmtString, ...) noexcept
 	va_start(args, fmtString);
 	
 	#ifdef __ANDROID__
-	__android_log_vprint(ANDROID_LOG_VERBOSE, "LOG", fmtString, args);
+	__android_log_vprint(ANDROID_LOG_INFO, "LOG_INFO", fmtString, args);
 	#else
 	if(vfprintf(stdout, fmtString, args) < 0 )
 		LogError("Failed to print Log");
@@ -82,7 +82,7 @@ void LogError(const char* fmtString, ...) noexcept
 		
 		// print to stderr
 		#ifdef __ANDROID__
-		__android_log_print(ANDROID_LOG_ERROR, "LOG ERROR", "%s", errstr.c_str());
+		__android_log_print(ANDROID_LOG_ERROR, "LOG_ERROR", "%s", errstr.c_str());
 		#else
 		fprintf(stderr, "%s\n", errstr.c_str());
 		#endif
