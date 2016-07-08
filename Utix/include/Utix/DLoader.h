@@ -30,7 +30,7 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 #elif defined(_WIN32)
 #include <windows.h>
 #else
-#error "Unknown Plataform utils DLoader"
+#error Utix DLoader - Unknown Plataform
 #endif
 
 #include <string>

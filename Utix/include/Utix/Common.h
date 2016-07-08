@@ -61,6 +61,8 @@ inline void Sleep(const Nano& nano)
 #elif defined(_WIN32)
 	using namespace std::chrono;
 	::Sleep(static_cast<DWORD>(duration_cast<Milli>(nano).count()));
+#else
+#error Utix Common - Unknown Plataform
 #endif
 }
 

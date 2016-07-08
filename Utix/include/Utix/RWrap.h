@@ -109,7 +109,7 @@ private:
 template<class T, class F>
 constexpr 
 RWrap<T, F>::RWrap(F&& f) 
-	: _f(std::forward<F>(f))
+	: _f(forward<F>(f))
 {
 	static_assert(noexcept(_f(_t)), "Destructor's functor must be noexcept");
 }
@@ -117,8 +117,8 @@ RWrap<T, F>::RWrap(F&& f)
 template<class T, class F>
 constexpr
 RWrap<T, F>::RWrap(T&& t, F&& f) 
-	: _f(std::forward<F>(f)),
-	_t(std::forward<T>(t))
+	: _f(forward<F>(f)),
+	_t(forward<T>(t))
 {
 	static_assert(noexcept(_f(_t)), "Destructor's functor must be noexcept");
 }
@@ -126,8 +126,8 @@ RWrap<T, F>::RWrap(T&& t, F&& f)
 
 template<class T, class F>
 inline RWrap<T, F>::RWrap(RWrap&& other)
-	: _f(std::move(other._f)),
-	_t(std::move(other._t))
+	: _f(move(other._f)),
+	_t(move(other._t))
 {
 	other._t = nullptr;
 }
@@ -279,8 +279,8 @@ template<class ResourcePtr, class CleanupFunc>
 constexpr RWrap<ResourcePtr, CleanupFunc> 
 make_rwrap(ResourcePtr&& rptr, CleanupFunc&& fun) 
 {
-	return RWrap<ResourcePtr, CleanupFunc>(std::forward<ResourcePtr>(rptr),
-                                           std::forward<CleanupFunc>(fun));
+	return RWrap<ResourcePtr, CleanupFunc>(forward<ResourcePtr>(rptr),
+                                           forward<CleanupFunc>(fun));
 }
 
 

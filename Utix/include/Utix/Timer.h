@@ -30,6 +30,8 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 #include <Windows.h>
 
+#else
+#error Utix Timer - Unknown Plataform
 #endif
 
 

@@ -22,9 +22,12 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 #ifdef _WIN32
 #include <stdlib.h>
 #include <windows.h>
+
+
 #elif defined(__linux__) 
 #include <string.h>
 #include <unistd.h>
+
 #elif defined(__APPLE__)
 #include <mach-o/dyld.h>
 #endif
@@ -56,11 +59,11 @@ std::string GetFullProcName()
 
      }
 
-     std::string ret;
-     ret.resize(writeSize);
-     std::wcstombs(&ret[0], buffer, writeSize);
+     std::string proc_name;
+     proc_name.resize(writeSize);
+     std::wcstombs(&proc_name[0], buffer, writeSize);
      
-     return ret;
+     return proc_name;
 
 
 

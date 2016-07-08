@@ -41,6 +41,8 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 #define UTIX_DEBUG_BREAK_() __debugbreak()
 #elif defined(__linux__) || defined(__APPLE__)
 #define UTIX_DEBUG_BREAK_() raise(SIGTRAP)
+#else 
+#error Utix Assert - Unknown Platafor
 #endif
 
 #define UTIX_MACRO_STR_EX_(x) #x

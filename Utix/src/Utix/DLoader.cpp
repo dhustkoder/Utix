@@ -54,6 +54,8 @@ bool DLoader::Load(const std::string& dlPath)
 	constexpr const char* const postfix = ".dylib";
 #elif defined(_WIN32)
 	constexpr const char* const postfix = ".dll";
+#else 
+#error Utix DLoader - Unknown Plataform
 #endif
 
 
