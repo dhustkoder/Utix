@@ -143,7 +143,6 @@ Vector2<T>& Vector2<T>::operator=(const Vector2<T>& other)
 	x = other.x;
 	y = other.y;
 	return *this;
-
 }
 
 
@@ -156,7 +155,6 @@ Vector2<T>& Vector2<T>::operator+=(const Vector2<T>& other)
 	x += other.x;
 	y += other.y;
 	return *this;
-
 }
 
 
