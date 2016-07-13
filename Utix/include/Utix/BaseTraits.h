@@ -240,11 +240,17 @@ struct is_numeric :
 };
 
 
-
+template<class T, const size_t sz>
+constexpr size_t arr_size(const T(&)[sz])
+{
+     return sz;
+}
 
 template<class T>
-constexpr size_t ToSizeT(T value) { return static_cast<size_t>(value); }
-
+constexpr size_t ToSizeT(T value) 
+{ 
+     return static_cast<size_t>(value); 
+}
 
 
 // move and forward

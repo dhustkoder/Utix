@@ -26,19 +26,36 @@ namespace utix {
 
 
 
-
+// calls F no metter what
 template<class F>
 struct ScopeExit
 {
-	constexpr ScopeExit(F&& fun) noexcept : _fun(forward<F>(fun)) {
+	constexpr ScopeExit(F&& fun) noexcept : m_fun(forward<F>(fun)) {
 		static_assert(noexcept(fun()) == true, "ScopeExit functor must be noexcept!");
 	}
-	~ScopeExit() noexcept { _fun(); }
+	~ScopeExit() noexcept { m_fun(); }
 	ScopeExit(ScopeExit&& rhs) noexcept = default;
 	ScopeExit(const ScopeExit&) = delete;
 	ScopeExit& operator=(const ScopeExit&) = delete;
 private:
-	F _fun;
+	F m_fun;
+};
+
+// calls F if not canceled
+template<class F>
+struct ScopeExitIf
+{
+	constexpr ScopeExitIf(F&& fun) noexcept : m_fun(forward<F>(fun)) {
+		static_assert(noexcept(fun()) == true, "ScopeExitIf functor must be noexcept!");
+	}
+	~ScopeExitIf() noexcept { if(!m_canceled) m_fun(); }
+	ScopeExitIf(ScopeExitIf&& rhs) noexcept = default;
+	ScopeExitIf(const ScopeExitIf&) = delete;
+	ScopeExitIf& operator=(const ScopeExitIf&) = delete;
+	void Cancel() { m_canceled = true; }
+private:
+	F m_fun;
+	bool m_canceled = false;
 };
 
 
@@ -47,7 +64,10 @@ constexpr ScopeExit<Callable> MakeScopeExit(Callable&& c) {
 	return ScopeExit<Callable>(forward<Callable>(c));
 }
 
-
+template<class Callable>
+constexpr ScopeExitIf<Callable> MakeScopeExitIf(Callable&& c) {
+	return ScopeExitIf<Callable>(forward<Callable>(c));
+}
 
 
 

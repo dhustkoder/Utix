@@ -70,14 +70,6 @@ size_t> arr_size(const T arr)
 
 
 
-template<class T, const size_t sz>
-inline constexpr size_t arr_size(const T(&)[sz])
-{
-	return sz;
-}
-
-
-
 
 template<class T, const size_t sz>
 inline void arr_zero(T(&arr)[sz])
