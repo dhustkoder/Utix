@@ -34,8 +34,8 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 #include <signal.h>
 #endif
 
-#include <cassert>
-#include "Log.h"
+#include <stdio.h>
+#include <assert.h>
 
 #ifdef _WIN32
 #define UTIX_DEBUG_BREAK_() __debugbreak()
@@ -53,13 +53,14 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
                                                                          \
     if(!(cond))                                                          \
     {                                                                    \
-        utix::LogError("\n                          \n"                  \
+        fprintf(stderr,                                                  \
+                 "\n                          \n"                        \
                  "****************************\n"                        \
                  "*                          *\n"                        \
                  "*    !ASSERTION FAILED!    *\n"                        \
                  "*                          *\n"                        \
                  "****************************");                        \
-        utix::LogError("CONDITION: "#cond"\n"                            \
+        fprintf(stderr,"CONDITION: "#cond"\n"                            \
                  "MESSAGE:   " msg "\n"                                  \
                  "FILE: " __FILE__ ":" UTIX_MACRO_STR_(__LINE__)"\n");   \
         UTIX_DEBUG_BREAK_();                                             \
