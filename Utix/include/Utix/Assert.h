@@ -59,7 +59,7 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
                  "*                          *\n"                        \
                  "*    !ASSERTION FAILED!    *\n"                        \
                  "*                          *\n"                        \
-                 "****************************");                        \
+                 "****************************\n");                      \
         fprintf(stderr,"CONDITION: "#cond"\n"                            \
                  "MESSAGE:   " msg "\n"                                  \
                  "FILE: " __FILE__ ":" UTIX_MACRO_STR_(__LINE__)"\n");   \
