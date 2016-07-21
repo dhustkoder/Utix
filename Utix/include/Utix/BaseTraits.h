@@ -73,47 +73,54 @@ struct is_same<T, T> : true_type {};
 
 
 
-// is pointer
-template<class T>
-struct is_pointer : false_type {};
-template<class T>
-struct is_pointer<T*> : true_type {};
-template<class T>
-struct is_pointer<T* restrict> : true_type {};
-// C++14 variable template
-//template<class T>
-//constexpr bool is_pointer_v = is_pointer<T>::value;
-
-
-// is reference
-template<class T>
-struct is_reference : false_type {};
-template<class T>
-struct is_reference<T&> : true_type {};
-template<class T>
-struct is_reference<T&&> : true_type {};
-template<class T>
-struct is_reference<T& restrict> : true_type {};
-template<class T>
-struct is_reference<T&& restrict> : true_type {};
-// C++14 variable template
-//template<class T>
-//constexpr bool is_reference_v = is_reference<T>::value;
-
 
 
 // remove qualifiers:
 
+// remove const
+template<class T>
+struct remove_const : type_is<T> {};
+template<class T>
+struct remove_const<T const> : remove_const<T> {};
+template<class T>
+using remove_const_t = typename remove_const<T>::type;
+
+
+// remove volatile
+template<class T>
+struct remove_volatile : type_is<T> {};
+template<class T>
+struct remove_volatile<volatile T> : remove_volatile<T> {};
+template<class T>
+using remove_volatile_t = typename remove_volatile<T>::type;
+
+
+
+// remove cv
+template<class T>
+struct remove_cv : type_is< remove_volatile_t < remove_const_t<T> > > {};
+template<class T>
+using remove_cv_t = typename remove_cv<T>::type;
+
+
+
+
+
 // remove pointer
 template<class T>
-struct remove_pointer : type_is<T> {} ;
+struct _remove_pointer : type_is<T> {} ;
 template<class T>
-struct remove_pointer<T*> : remove_pointer<T> {};
+struct _remove_pointer<T*> : _remove_pointer<T> {};
 template<class T>
-struct remove_pointer<T* restrict> : remove_pointer<T> {};
+struct _remove_pointer<T* restrict> : _remove_pointer<T> {};
+template<class T>
+struct remove_pointer : _remove_pointer<remove_cv_t<T>> {};
 
 template<class T>
 using remove_pointer_t = typename remove_pointer<T>::type;
+
+
+
 
 
 //remove reference
@@ -134,32 +141,7 @@ using remove_reference_t = typename remove_reference<T>::type;
 
 
 
-// remove const
-template<class T>
-struct remove_const : type_is<T> {};
-template<class T>
-struct remove_const<const T> : remove_const<T> {};
-template<class T>
-using remove_const_t = typename remove_const<T>::type;
 
-
-// remove volatile
-template<class T>
-struct remove_volatile : type_is<T> {};
-template<class T>
-struct remove_volatile<volatile T> : remove_volatile<T> {};
-template<class T>
-using remove_volatile_t = typename remove_volatile<T>::type;
-
-
-
-
-
-// remove cv
-template<class T>
-struct remove_cv : type_is< remove_volatile_t < remove_const_t<T> > > {};
-template<class T>
-using remove_cv_t = typename remove_cv<T>::type;
 
 // remove cvr
 template<class T>
@@ -177,6 +159,11 @@ template<class T>
 using remove_array_t = typename remove_array<T>::type;
 
 
+
+
+
+
+
 // remove all
 template<class T>
 struct remove_all : type_is< remove_cv_t < remove_pointer_t < remove_reference_t< remove_array_t< remove_cv_t<T> > > > > > {};
@@ -184,6 +171,59 @@ struct remove_all : type_is< remove_cv_t < remove_pointer_t < remove_reference_t
 
 template<class T>
 using remove_all_t = typename remove_all<T>::type;
+
+
+
+
+
+// is pointer
+template<class T>
+struct _is_pointer : false_type {};
+template<class T>
+struct _is_pointer<T*> : true_type {};
+template<class T>
+struct _is_pointer<T* restrict> : true_type {};
+template<class T>
+struct is_pointer : _is_pointer<remove_cv_t<T>> {};
+
+// C++14 variable template
+//template<class T>
+//constexpr bool is_pointer_v = is_pointer<T>::value;
+
+
+// is reference
+template<class T>
+struct _is_reference : false_type {};
+template<class T>
+struct _is_reference<T&> : true_type {};
+template<class T>
+struct _is_reference<T&&> : true_type {};
+template<class T>
+struct _is_reference<T& restrict> : true_type {};
+template<class T>
+struct _is_reference<T&& restrict> : true_type {};
+template<class T>
+struct is_reference : _is_reference<T> {};
+
+// C++14 variable template
+//template<class T>
+//constexpr bool is_reference_v = is_reference<T>::value;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // enable_if
