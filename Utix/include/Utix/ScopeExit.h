@@ -20,6 +20,7 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 #ifndef UTIX_SCOPE_EXIT_H_
 #define UTIX_SCOPE_EXIT_H_
+#include "Exceptions.h"
 #include "BaseTraits.h"
 
 namespace utix {
@@ -30,11 +31,22 @@ namespace utix {
 template<class F>
 struct ScopeExit
 {
+#if UTIX_HAS_EXCEPTIONS_
+
 	constexpr ScopeExit(F&& fun) noexcept : m_fun(forward<F>(fun)) {
 		static_assert(noexcept(fun()) == true, "ScopeExit functor must be noexcept!");
 	}
 	~ScopeExit() noexcept { m_fun(); }
 	ScopeExit(ScopeExit&& rhs) noexcept = default;
+
+#else
+
+	constexpr ScopeExit(F&& fun) : m_fun(forward<F>(fun)) {}
+	~ScopeExit() { m_fun(); }
+	ScopeExit(ScopeExit&& rhs) = default;
+
+#endif
+
 	ScopeExit(const ScopeExit&) = delete;
 	ScopeExit& operator=(const ScopeExit&) = delete;
 private:
@@ -45,11 +57,22 @@ private:
 template<class F>
 struct ScopeExitIf
 {
+#if UTIX_HAS_EXCEPTIONS_
+
 	constexpr ScopeExitIf(F&& fun) noexcept : m_fun(forward<F>(fun)) {
 		static_assert(noexcept(fun()) == true, "ScopeExitIf functor must be noexcept!");
 	}
-	~ScopeExitIf() noexcept { if(!m_canceled) m_fun(); }
+	~ScopeExitIf() noexcept { if (!m_canceled) m_fun(); }
 	ScopeExitIf(ScopeExitIf&& rhs) noexcept = default;
+
+#else 
+
+	constexpr ScopeExitIf(F&& fun) : m_fun(forward<F>(fun)) {}
+	~ScopeExitIf() { if (!m_canceled) m_fun(); }
+	ScopeExitIf(ScopeExitIf&& rhs) = default;
+
+#endif
+
 	ScopeExitIf(const ScopeExitIf&) = delete;
 	ScopeExitIf& operator=(const ScopeExitIf&) = delete;
 	void Cancel() { m_canceled = true; }

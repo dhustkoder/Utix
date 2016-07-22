@@ -25,6 +25,7 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 #define UTIX_VECTOR_H_
 
 #include <initializer_list>
+#include "Exceptions.h"
 #include "Traits.h"
 #include "Alloc.h"
 #include "Assert.h"

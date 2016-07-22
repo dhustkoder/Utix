@@ -92,5 +92,8 @@
     <ClInclude Include="..\..\Utix\include\Utix\Restrict.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Utix\include\Utix\Exceptions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

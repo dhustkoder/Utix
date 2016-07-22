@@ -152,6 +152,7 @@
     <ClInclude Include="..\..\Utix\include\Utix\Color.h" />
     <ClInclude Include="..\..\Utix\include\Utix\Common.h" />
     <ClInclude Include="..\..\Utix\include\Utix\DLoader.h" />
+    <ClInclude Include="..\..\Utix\include\Utix\Exceptions.h" />
     <ClInclude Include="..\..\Utix\include\Utix\Ints.h" />
     <ClInclude Include="..\..\Utix\include\Utix\Log.h" />
     <ClInclude Include="..\..\Utix\include\Utix\Memory.h" />
