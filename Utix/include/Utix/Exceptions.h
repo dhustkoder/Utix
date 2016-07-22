@@ -1,4 +1,4 @@
-#define UTIX_BASETRAITS_H_
+#define UTIX_EXCEPTIONS_H_
 
 #if __EXCEPTIONS
 #define UTIX_HAS_EXCEPTIONS_ 1
