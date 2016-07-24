@@ -23,16 +23,15 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 #define UTIX_ALLOC_H_
 #include <stdlib.h>
 #include <string.h>
+#include "Exceptions.h"
 #include "Ints.h"
 #include "BaseTraits.h"
 #include "Assert.h"
 
 namespace utix {
 
-
-extern void* alloc_arr(const size_t bytes) noexcept;
-
-extern void* realloc_arr(void* from, const size_t bytes) noexcept;
+extern void* alloc_arr(const size_t bytes) UTIX_NOEXCEPT_;
+extern void* realloc_arr(void* from, const size_t bytes) UTIX_NOEXCEPT_;
 
 inline void free_arr(const void* block)
 {

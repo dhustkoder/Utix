@@ -69,19 +69,19 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Users\Rafael\Documents\GitHub\XChip\XChip\dependencies\Utix\Utix\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)\..\..\Utix\Include\;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)$(Configuration)\lib\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\Users\Rafael\Documents\GitHub\XChip\XChip\dependencies\Utix\Utix\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)\..\..\Utix\Include\;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)$(Configuration)\lib\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Users\Rafael\Documents\GitHub\XChip\XChip\dependencies\Utix\Utix\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)\..\..\Utix\Include\;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\lib\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>C:\Users\Rafael\Documents\GitHub\XChip\XChip\dependencies\Utix\Utix\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)\..\..\Utix\Include\;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\lib\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -158,7 +158,6 @@
     <ClInclude Include="..\..\Utix\include\Utix\Memory.h" />
     <ClInclude Include="..\..\Utix\include\Utix\NotNull.h" />
     <ClInclude Include="..\..\Utix\include\Utix\Process.h" />
-    <ClInclude Include="..\..\Utix\include\Utix\Restrict.h" />
     <ClInclude Include="..\..\Utix\include\Utix\RWrap.h" />
     <ClInclude Include="..\..\Utix\include\Utix\ScopeExit.h" />
     <ClInclude Include="..\..\Utix\include\Utix\Timer.h" />

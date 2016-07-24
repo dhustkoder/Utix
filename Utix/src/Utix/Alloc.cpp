@@ -27,7 +27,7 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 namespace utix {
 
 
-void* alloc_arr(const size_t size) noexcept
+void* alloc_arr(const size_t size) UTIX_NOEXCEPT_
 {
 	ASSERT_MSG(size > 0, "attempt to alloc array of size 0");
 
@@ -44,7 +44,7 @@ void* alloc_arr(const size_t size) noexcept
 
 
 
-void* realloc_arr(void* from, const size_t size) noexcept
+void* realloc_arr(void* from, const size_t size) UTIX_NOEXCEPT_
 {
 	ASSERT_MSG(from != nullptr, "attempt to realloc from null pointer!");
 	ASSERT_MSG(size > 0, "attempt to realloc to size 0!");

@@ -21,7 +21,6 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 #ifndef UTIX_BASETRAITS_H_
 #define UTIX_BASETRAITS_H_
 #include "Ints.h"
-#include "Restrict.h"
 
 namespace utix {
 
@@ -104,8 +103,6 @@ struct _remove_pointer : type_is<T> {} ;
 template<class T>
 struct _remove_pointer<T*> : _remove_pointer<T> {};
 template<class T>
-struct _remove_pointer<T* restrict> : _remove_pointer<T> {};
-template<class T>
 struct remove_pointer : _remove_pointer<remove_cv_t<T>> {};
 
 template<class T>
@@ -122,11 +119,6 @@ template<class T>
 struct remove_reference<T&> : remove_reference<T> {};
 template<class T>
 struct remove_reference<T&&> : remove_reference<T> {};
-template<class T>
-struct remove_reference<T& restrict> : remove_reference<T> {};
-template<class T>
-struct remove_reference<T&& restrict> : remove_reference<T> {};
-
 template<class T>
 using remove_reference_t = typename remove_reference<T>::type;
 
@@ -174,8 +166,6 @@ struct _is_pointer : false_type {};
 template<class T>
 struct _is_pointer<T*> : true_type {};
 template<class T>
-struct _is_pointer<T* restrict> : true_type {};
-template<class T>
 struct is_pointer : _is_pointer<remove_cv_t<T>> {};
 
 // C++14 variable template
@@ -190,10 +180,6 @@ template<class T>
 struct _is_reference<T&> : true_type {};
 template<class T>
 struct _is_reference<T&&> : true_type {};
-template<class T>
-struct _is_reference<T& restrict> : true_type {};
-template<class T>
-struct _is_reference<T&& restrict> : true_type {};
 template<class T>
 struct is_reference : _is_reference<T> {};
 
