@@ -160,6 +160,7 @@
     <ClInclude Include="..\..\Utix\include\Utix\Process.h" />
     <ClInclude Include="..\..\Utix\include\Utix\RWrap.h" />
     <ClInclude Include="..\..\Utix\include\Utix\ScopeExit.h" />
+    <ClInclude Include="..\..\Utix\include\Utix\Alloc_t.h" />
     <ClInclude Include="..\..\Utix\include\Utix\Timer.h" />
     <ClInclude Include="..\..\Utix\include\Utix\Traits.h" />
     <ClInclude Include="..\..\Utix\include\Utix\Vector.h" />
