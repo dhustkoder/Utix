@@ -494,7 +494,7 @@ inline bool Vector<TYPE>::reserve_init(size_t requested_size)
 		}
 
 
-		_data = (TYPE*) alloc_arr(bytes_to_allocate);
+		_data = alloc_arr<TYPE>(bytes_to_allocate);
 		return _data != nullptr;
 	}
 
@@ -566,7 +566,7 @@ bool> Vector<TYPE>::_reserve(size_t requested_size)
 		return false;
 	}
 
-	TYPE* const buff = (TYPE*) realloc_arr(_data, bytes_to_allocate);
+	TYPE* const buff = realloc_arr<TYPE>(_data, bytes_to_allocate);
 
 	if(buff)
 	{
@@ -676,7 +676,7 @@ bool> Vector<TYPE>::_reserve(size_t requested_size)
 		return false;
 	}
 
-	TYPE* const buff = (TYPE*) alloc_arr( bytes_to_allocate );
+	TYPE* const buff = alloc_arr<TYPE>( bytes_to_allocate );
 
 	if(!buff) 
 	{

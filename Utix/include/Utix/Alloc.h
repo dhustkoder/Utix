@@ -30,8 +30,21 @@ along with this program.  If not, see http://www.gnu.org/licenses/gpl-3.0.html.
 
 namespace utix {
 
-extern void* alloc_arr(const size_t bytes) UTIX_NOEXCEPT_;
-extern void* realloc_arr(void* from, const size_t bytes) UTIX_NOEXCEPT_;
+extern void* _alloc_arr(const size_t bytes) UTIX_NOEXCEPT_;
+extern void* _realloc_arr(void* from, const size_t bytes) UTIX_NOEXCEPT_;
+
+
+template<class T = uint8_t>
+inline T* alloc_arr(const size_t size) {
+	return static_cast<T*>(_alloc_arr(sizeof(T) * size));
+}
+
+
+template<class T = uint8_t>
+inline T* realloc_arr(void* from, const size_t size) {
+	return static_cast<T*>(_realloc_arr(from, sizeof(T) * size));
+}
+
 
 inline void free_arr(const void* block)
 {
