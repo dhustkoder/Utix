@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.8.8)
 project(Utix)
 
 option(BUILD_UTIX_TEST OFF)
+option(BUILD_UTIX_FPIC OFF)
 option(ADDRESS_SANITIZER OFF)
 option(MEMORY_SANITIZER OFF)
 option(ENABLE_LTO OFF)
@@ -21,9 +22,7 @@ endif()
 
 # "Release" full optimization , no debug info.
 if(${CMAKE_BUILD_TYPE} STREQUAL "Release")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG -O3 -fomit-frame-pointer -ffunction-sections -fdata-sections -g0")
-
-
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG -O3 -fomit-frame-pointer -ffunction-sections -fdata-sections -fno-unwind-tables -g0")
 
 # "Debug" full debug information, no optimization, asserts enabled
 elseif(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
@@ -81,15 +80,12 @@ INSTALL(TARGETS ${PROJECT_NAME}  DESTINATION ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_T
 
 
 # compile  fpic version
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
-
-add_library(UtixFPIC ${UTIX_HEADERS} ${UTIX_SRC})
-
-target_link_libraries(UtixFPIC -ldl)
-
-INSTALL(TARGETS UtixFPIC DESTINATION ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/lib/)
-
+if(BUILD_UTIX_FPIC)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+	add_library(UtixFPIC ${UTIX_HEADERS} ${UTIX_SRC})
+	target_link_libraries(UtixFPIC -ldl)
+	INSTALL(TARGETS UtixFPIC DESTINATION ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/lib/)
+endif()
 
 
 # build test 
@@ -99,9 +95,6 @@ if( BUILD_UTIX_TEST )
 	target_link_libraries(UTIX_TEST Utix)
 	INSTALL(TARGETS UTIX_TEST  DESTINATION ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/Test/)
 endif()
-
-
-
 
 
 
