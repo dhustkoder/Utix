@@ -8,6 +8,10 @@ inline T* malloc_t(const size_t size = 1) {
 	return static_cast<T*>(malloc(sizeof(T) * size));
 }
 
+template<class T>
+inline T* calloc_t(const size_t size = 1) {
+	return static_cast<T*>(calloc(size, sizeof(T)));
+}
 
 
 template<class T>
