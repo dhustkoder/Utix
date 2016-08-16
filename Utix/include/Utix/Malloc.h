@@ -1,6 +1,7 @@
-#ifndef UTIX_ALLOC_T_H_
-#define UTIX_ALLOC_T_H_
+#ifndef UTIX_MALLOC_H_
+#define UTIX_MALLOC_H_
 #include <stdlib.h>
+
 namespace utix {
 
 template<class T>
