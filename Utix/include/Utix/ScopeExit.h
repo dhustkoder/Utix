@@ -41,9 +41,9 @@ struct ScopeExit
 
 #else
 
-	constexpr ScopeExit(F&& fun) : m_fun(forward<F>(fun)) {}
+	constexpr ScopeExit(F&& fun) noexcept : m_fun(forward<F>(fun)) {}
 	~ScopeExit() { m_fun(); }
-	ScopeExit(ScopeExit&& rhs) = default;
+	ScopeExit(ScopeExit&& rhs) noexcept = default;
 
 #endif
 
@@ -67,7 +67,7 @@ struct ScopeExitIf
 
 #else 
 
-	constexpr ScopeExitIf(F&& fun) : m_fun(forward<F>(fun)) {}
+	constexpr ScopeExitIf(F&& fun) noexcept : m_fun(forward<F>(fun)) {}
 	~ScopeExitIf() { if (!m_canceled) m_fun(); }
 	ScopeExitIf(ScopeExitIf&& rhs) = default;
 
